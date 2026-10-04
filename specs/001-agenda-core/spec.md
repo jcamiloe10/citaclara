@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-02
 
-**Status**: Aprobada (2026-10-02) · Propietario: Camilo (ver `specs/MAPA.md`)
+**Status**: Cerrada (2026-10-03) · Propietario: Camilo (ver `specs/MAPA.md`) · Aprobada el 2026-10-02
 
 **Input**: User description: "Núcleo de agenda de CitaClara para clínicas pequeñas (2-5 profesionales). La recepción gestiona la agenda; los pacientes solo existen como fichas. Incluye clínica, profesionales, servicios, pacientes y citas; regla de cero solapes (también con reservas simultáneas); no crear citas en el pasado; agenda del día por profesional; alta de cita; marcar completada / cancelada / no asistida; acceso con clave de clínica; datos de demostración deterministas (Clínica Eleva)."
 

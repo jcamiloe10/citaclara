@@ -4,7 +4,7 @@ Fuente única de verdad sobre la propiedad de cada spec (Constitución, Principi
 
 | Spec | Propietario | Estado | Zona de comportamiento que toca |
 |------|-------------|--------|---------------------------------|
-| [001-agenda-core](001-agenda-core/spec.md) | Camilo | Aprobada (2026-10-02) | Agenda de cada profesional (escribe citas); acceso de recepción; datos de demostración |
+| [001-agenda-core](001-agenda-core/spec.md) | Camilo | Cerrada (2026-10-03) | Agenda de cada profesional (escribe citas); acceso de recepción; datos de demostración |
 
 ## Relaciones entre specs
 
