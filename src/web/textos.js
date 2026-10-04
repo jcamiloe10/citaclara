@@ -1,0 +1,89 @@
+// Todos los textos visibles, en español de España y sin jerga técnica (Principio VIII).
+export const textos = {
+  marca: 'CitaClara',
+  volverAgenda: 'Volver a la agenda',
+  cerrarSesion: 'Cerrar sesión',
+  zonaHoraria: 'Todas las horas son hora de España.',
+
+  acceso: {
+    titulo: 'Acceso de recepción',
+    etiquetaClave: 'Clave de la clínica',
+    boton: 'Entrar',
+    ayuda: 'Escribe la clave que te dio la clínica para ver la agenda.',
+    claveIncorrecta: 'La clave no es correcta',
+  },
+
+  agenda: {
+    titulo: 'Agenda del día',
+    anterior: 'Día anterior',
+    hoy: 'Hoy',
+    siguiente: 'Día siguiente',
+    nuevaCita: 'Nueva cita',
+    libre: 'Libre',
+    reservar: 'Reservar',
+    cerrado: 'La clínica no abre este día',
+    sinCitas: 'Sin citas',
+    historico: 'Canceladas y no asistidas',
+    diaInvalido: 'El día indicado no es válido',
+    paciente: 'Paciente',
+    servicio: 'Servicio',
+  },
+
+  estados: {
+    reservada: { texto: 'Reservada', icono: '🕒' },
+    completada: { texto: 'Completada', icono: '✔' },
+    cancelada: { texto: 'Cancelada', icono: '✖' },
+    no_asistida: { texto: 'No asistida', icono: '⚠' },
+  },
+
+  acciones: {
+    completada: 'Completada',
+    cancelada: 'Cancelada',
+    no_asistida: 'No asistida',
+    aunNoEmpieza: 'Disponible cuando empiece la cita',
+    confirmarCancelar: '¿Cancelar esta cita?',
+  },
+
+  avisos: {
+    reservada: (c) => `Cita reservada: ${c}`,
+    estado: (c, estado) => `La cita de ${c} ha pasado a «${estado}»`,
+  },
+
+  alta: {
+    titulo: 'Nueva cita',
+    profesional: 'Profesional',
+    servicio: 'Servicio',
+    paciente: 'Paciente',
+    pacienteNuevoOpcion: 'Paciente nuevo (datos abajo)',
+    pacienteNuevoTitulo: 'Datos del paciente nuevo',
+    pacienteNuevoAyuda: 'Solo si el paciente no está en la lista.',
+    nombre: 'Nombre y apellidos',
+    telefono: 'Teléfono',
+    email: 'Correo electrónico',
+    dia: 'Día',
+    hora: 'Hora de inicio',
+    elegir: 'Elige…',
+    finCalculado: (h) => `Terminaría a las ${h}`,
+    boton: 'Reservar cita',
+    cancelar: 'Volver a la agenda',
+    fichaCreada: (n) => `Se ha guardado la ficha de ${n}. Elige otro hueco para reservar su cita.`,
+  },
+
+  errores: {
+    ocupado: 'Ese hueco ya está ocupado',
+    pasado: 'No se pueden crear citas en el pasado',
+    fueraDeHorario:
+      'La clínica atiende de lunes a viernes, de 09:00 a 20:00; la cita debe empezar y terminar dentro de ese horario',
+    horaInvalida: 'La cita debe empezar en punto, y cuarto, y media o menos cuarto',
+    datos: 'Revisa los datos marcados',
+    noEncontrado: 'No se ha podido encontrar alguno de los datos elegidos',
+    elegirPaciente: 'Elige un paciente de la lista o escribe los datos de uno nuevo',
+    noReservada: 'Esa cita ya no está reservada',
+    aunNoHaEmpezado: 'Todavía no ha empezado la cita',
+    estadoNoPermitido: 'Ese cambio no está permitido',
+    citaNoEncontrada: 'No se encuentra la cita',
+    formularioCaducado: 'El formulario ha caducado. Vuelve a la agenda e inténtalo de nuevo.',
+    inesperado: 'Ha ocurrido un problema. Inténtalo de nuevo en unos instantes.',
+    paginaNoEncontrada: 'No se encuentra la página',
+  },
+};
