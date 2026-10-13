@@ -6,7 +6,7 @@
 
 ## Summary
 
-Un proceso diario (`npm run recordatorios`) recorre las citas reservadas que empiezan entre 24 y 48 horas después del instante de ejecución y genera un recordatorio por email para cada una, una sola vez, aunque se ejecute varias veces o a la vez. En el modo simulado (el único de la v1) cada recordatorio es un fichero `.eml` en `datos/salida-correo/`. El email lleva los datos de la cita y un enlace personal e inadivinable; el enlace abre una página pública de dos pasos (ver y confirmar) que cancela la cita si faltan 24 horas o más, y si no, indica que hay que llamar a la clínica. La cancelación solo libera hueco, así que no puede crear solapes. Recepción ve en la agenda del día qué citas canceló el paciente y cuáles no pudieron recordarse por falta de email. Sin dependencias nuevas: se reutilizan Node.js 24, Express, `node:sqlite` y `node:crypto`. Decisiones y alternativas en [research.md](research.md).
+Un proceso diario (`npm run recordatorios`) recorre las citas reservadas que empiezan entre 24 y 48 horas después del instante de ejecución y genera un recordatorio por email para cada una, una sola vez, aunque se ejecute varias veces o a la vez. En el modo simulado (el único de la v1) cada recordatorio es un fichero `.eml` en `datos/salida-correo/`. El email lleva los datos de la cita y un enlace personal e inadivinable; el enlace abre una página pública de dos pasos (ver y confirmar) que cancela la cita si faltan 24 horas o más, y si no, indica que hay que llamar a la clínica. La cancelación solo libera hueco, así que no puede crear solapes. Recepción ve en la agenda del día qué citas canceló el paciente y cuáles no pudieron recordarse por falta de email. Se implementa **después de la 002** y reutiliza sus adiciones a la 001 (origen de la cancelación, teléfono de la clínica) y su función de cancelación del paciente, sin duplicarlas. Sin dependencias nuevas: se reutilizan Node.js 24, Express, `node:sqlite` y `node:crypto`. Decisiones y alternativas en [research.md](research.md).
 
 ## Technical Context
 
@@ -14,7 +14,7 @@ Un proceso diario (`npm run recordatorios`) recorre las citas reservadas que emp
 
 **Primary Dependencies**: ninguna nueva. `express` (ya existente) para la página pública; `node:sqlite`, `node:crypto`, `node:fs` y `node:test` de la biblioteca estándar
 
-**Storage**: la misma base SQLite de la 001. Dos tablas nuevas (`recordatorio`, `clinica_contacto`), creadas con `CREATE TABLE IF NOT EXISTS`, sin tocar las tablas de la 001. Ficheros `.eml` en `datos/salida-correo/` (no versionados)
+**Storage**: la misma base SQLite de la 001. Una tabla nueva (`recordatorio`), creada con `CREATE TABLE IF NOT EXISTS`; reutiliza `cita.cancelada_por_paciente` y `clinica.telefono` que añade la 002, y no modifica ninguna otra tabla. Ficheros `.eml` en `datos/salida-correo/` (no versionados)
 
 **Testing**: `node:test` + `node:assert`, igual que la 001: unitarias (ventana, mensaje, token), integración HTTP del enlace, concurrencia con procesos hijos (dos ejecuciones simultáneas; cancelación frente a reserva), y comprobación de trazabilidad spec ↔ pruebas ampliada a la 003
 
@@ -26,7 +26,7 @@ Un proceso diario (`npm run recordatorios`) recorre las citas reservadas que emp
 
 **Constraints**: cero duplicados con ejecuciones simultáneas; cancelar nunca crea solape; horas ligadas a `Europe/Madrid`; todo texto en español de España; el enlace no contiene datos personales ni permite deducir otra cita; sin dependencias nuevas
 
-**Scale/Scope**: 1 clínica en la demo (modelo multi-clínica), ~203 citas futuras en la semilla; 1 pantalla pública nueva (con 2 pasos), 1 comando, 2 tablas, 1 ampliación de la agenda del día
+**Scale/Scope**: 1 clínica en la demo (modelo multi-clínica), ~203 citas futuras en la semilla; 1 pantalla pública nueva (con 2 pasos), 1 comando, 1 tabla, 1 ampliación de la agenda del día
 
 ## Constitution Check
 
@@ -34,9 +34,9 @@ Un proceso diario (`npm run recordatorios`) recorre las citas reservadas que emp
 
 | Principio | Cumplimiento | Dónde |
 |---|---|---|
-| I. Spec First | La spec está en `specs/003-recordatorios-cita/` con propietario (Camilo) en [specs/MAPA.md](../MAPA.md), y la relación con la 001 y la 002 declarada allí. La 001 está cerrada: la 003 no cambia su comportamiento; solo añade tablas y un indicador en la agenda del día. | [spec.md](spec.md) (Status, FR-023, Assumptions) |
+| I. Spec First | La spec está en `specs/003-recordatorios-cita/` con propietario (Camilo) en [specs/MAPA.md](../MAPA.md), y la relación con la 001 y la 002 declarada allí. La 001 está cerrada: la 003 no cambia su comportamiento; solo añade una tabla y un indicador en la agenda del día. Se implementa después de la 002 y reutiliza sus adiciones (relación y orden acordados en el MAPA, aprobados el 2026-10-13). | [spec.md](spec.md) (Status, FR-023, Assumptions) |
 | II. Precisión numérica y temporal | La ventana y el margen de 24 h se calculan en instantes absolutos; toda hora mostrada pasa por `src/domain/tiempo.js` en `Europe/Madrid` (una sola fuente de formato, incluido el cambio de hora). No hay importes en esta feature. | research D2, D9 |
-| III. Cero solapes | Cancelar solo cambia `reservada → cancelada` con una transacción inmediata y una condición `estado = 'reservada'` en el `UPDATE`: libera ocupación, nunca la crea. Pruebas con procesos reales que cancelan y reservan el mismo hueco a la vez (el disparador de la 001 sigue siendo la red de seguridad). | research D5; data-model |
+| III. Cero solapes | Cancelar usa la función de la 002 (`cancelarComoPaciente`): transacción inmediata y `UPDATE` condicionado a `estado = 'reservada'`; solo libera ocupación, nunca la crea. Pruebas con procesos reales que cancelan y reservan el mismo hueco a la vez (el disparador de la 001 sigue siendo la red de seguridad). | research D5; data-model |
 | IV. Simplicidad y cero alcance fantasma | Cero dependencias; sin planificador propio dentro del servidor (lo programa el sistema); sin servicio de correo real, sin SMS/WhatsApp, sin editar el teléfono por pantalla; solo lo que pide la spec. | research D1, D3, D8 |
 | V. Datos reproducibles | La semilla de la 001 se amplía solo con el teléfono de la clínica; los recuentos esperados de recordatorios se publican en el quickstart con un instante de referencia fijado. | research D10; quickstart |
 | VI. Tests con la spec | Cada FR, escenario y SC lleva su prueba con el identificador entre corchetes; `npm run trazabilidad` pasa a comprobar también la 003 (con etiquetas propias para no mezclar con la 001). | research D11 |
@@ -76,10 +76,10 @@ package.json                     # + script "recordatorios"
 src/
 ├── config.js                    # MOD: urlPublica, carpetaCorreo, remitente
 ├── app.js                       # MOD: monta las rutas públicas del enlace (sin sesión)
-├── db/schema.sql                # MOD: tablas recordatorio y clinica_contacto
+├── db/schema.sql                # MOD: tabla recordatorio (la migración de la 002 aporta las columnas que reutiliza)
 ├── domain/
-│   ├── recordatorios.js         # NUEVO: ventana, generar (idempotente), consultar y cancelar por enlace
-│   ├── enlaces.js               # NUEVO: token aleatorio y su huella (SHA-256)
+│   ├── recordatorios.js         # NUEVO: ventana, generar (idempotente), consultar y cancelar por enlace (llama a cancelarComoPaciente de la 002)
+│   ├── enlaces.js               # 002: se reutiliza (secreto, formato y huella); solo se extrae un generador si falta
 │   └── agenda.js                # MOD: la agenda del día incluye el estado del recordatorio de cada cita
 ├── correo/
 │   ├── mensaje.js               # NUEVO: compone el mensaje (asunto, cuerpo) y lo serializa como .eml
@@ -90,11 +90,11 @@ src/
 ├── web/
 │   ├── rutas/enlace.js          # NUEVO: GET/POST /cancelar/:token (públicas)
 │   ├── vistas/enlace.js         # NUEVO: páginas del paciente
-│   ├── vistas/agenda.js         # MOD: etiquetas "Cancelada por el paciente" y "Sin email"
+│   ├── vistas/agenda.js         # MOD: etiqueta "Sin email" (la de "Cancelada por el paciente" ya la da la 002)
 │   └── textos.js                # MOD: textos de la página del enlace y de las etiquetas
 └── seed/
-    ├── datos.js                 # MOD: teléfono de la clínica de demostración
-    └── seed.js                  # MOD: carga el teléfono y borra los recordatorios al recargar
+    ├── datos.js                 # 002: ya incluye el teléfono de la clínica; sin cambios
+    └── seed.js                  # MOD: borra los recordatorios de la clínica al recargar
 
 scripts/
 └── trazabilidad.js              # MOD: comprueba cada spec contra sus pruebas (001 y 003)
@@ -115,7 +115,7 @@ README.md                        # MOD: comando, programación diaria y aviso de
 
 1. **El proceso debe ejecutarse todos los días, también sábado y domingo.** Con la ventana 24-48 h y la apertura a las 09:00, las citas del lunes solo entran en la ventana de la ejecución del domingo por la mañana. Si ese día no se ejecuta, las citas del lunes no recibirían recordatorio. Se recomienda programarlo cada día antes de las 09:00 (p. ej. 07:00). Una ejecución tardía solo avisa de las citas que aún caen en la ventana (las demás ya no tienen margen de 24 h para cancelar).
 2. **Un recordatorio por cita y hora de inicio.** Si la hora de la cita cambia (en la 001, cancelar y crear otra; en el futuro, reprogramar), la cita en su nueva hora recibe su propio recordatorio y el enlace anterior deja de valer (spec FR-017/FR-018).
-3. **Teléfono de la clínica como dato nuevo.** La 001 no lo guarda; se añade la tabla `clinica_contacto`. No hay pantalla para editarlo en la v1 (cero alcance fantasma): la semilla lo carga y una clínica real lo fija en la base. Queda anotado en la spec (Assumptions).
+3. **Teléfono y origen de la cancelación vienen de la 002.** La 003 no añade datos de contacto ni otra marca de origen: reutiliza `clinica.telefono` y `cita.cancelada_por_paciente`. Por eso **se implementa después de la 002** (orden acordado en `specs/MAPA.md`). No hay pantalla para editar el teléfono en la v1 (cero alcance fantasma).
 4. **Carpeta `datos/` frente a `data/`.** La 001 guarda la base en `data/` (en inglés); la spec fija `datos/salida-correo/` para los correos. Se respeta la spec y se añade `datos/` al `.gitignore` (contiene datos personales de la demostración). Unificar los nombres de carpeta queda fuera de esta spec.
 5. **La página del enlace es pública y no usa la sesión de recepción.** Se protege con un token de 256 bits, `no-store`, `no-referrer` y `noindex`; abrir el enlace no cambia nada (los gestores de correo y antivirus pueden abrirlo por su cuenta). No se añade limitación de intentos (el token no es adivinable); si hace falta, será una spec propia.
 

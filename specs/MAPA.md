@@ -5,10 +5,12 @@ Fuente única de verdad sobre la propiedad de cada spec (Constitución, Principi
 | Spec | Propietario | Estado | Zona de comportamiento que toca |
 |------|-------------|--------|---------------------------------|
 | [001-agenda-core](001-agenda-core/spec.md) | Camilo | Cerrada (2026-10-03) | Agenda de cada profesional (escribe citas); acceso de recepción; datos de demostración |
-| [003-recordatorios-cita](003-recordatorios-cita/spec.md) | Camilo | Borrador (2026-10-13) | Cancela citas de la agenda de cada profesional (solo libera huecos); correo de salida |
+| [002-portal-del-paciente](002-portal-del-paciente/spec.md) | Camilo | Aprobada (2026-10-13), decisiones de Sara incorporadas | Estado de las citas (solo cancela: reservada → cancelada); acceso personal del paciente; ficha del paciente; datos de demostración (teléfono de la clínica) |
+| [003-recordatorios-cita](003-recordatorios-cita/spec.md) | Camilo | Aprobada (2026-10-13), decisiones de Sara incorporadas | Estado de las citas (solo cancela: reservada → cancelada, vía la regla de la 002); correo de salida; tabla de recordatorios |
 
 ## Relaciones entre specs
 
-- **003-recordatorios-cita → 001**: la 003 cancela citas (solo libera huecos, nunca crea solapes) y amplía la cita con el origen de la cancelación. Orden y reglas de convivencia por acordar con el propietario de la 001 antes de implementar. También conviene alinear la regla de cancelación con la 002 (portal del paciente).
+- **003 → 001**: la 003 cancela citas (solo libera huecos, nunca crea solapes) reutilizando sin cambios la transición reservada → cancelada, la liberación del hueco y la regla de Cero Solapes de la 001. No amplía ninguna tabla de la 001: solo añade la tabla `recordatorio`.
+- **003 → 002**: la 003 se implementa **después de la 002** y reutiliza sus adiciones a la 001 (`cita.cancelada_por_paciente`, `clinica.telefono`), su regla de cancelación del paciente (hasta 24 h antes) y la etiqueta "Cancelada por el paciente" de la agenda de recepción; no las duplica. Los accesos son distintos: la 002 da un enlace personal por paciente (lo entrega recepción); la 003 da un enlace por cita dentro del recordatorio. Aprobada el 2026-10-13 por Camilo, propietario de la 001, la 002 y la 003.
 
 Toda spec futura que escriba en la agenda de un profesional deberá declarar aquí su relación con la 001 y acordar con su propietario el orden y las reglas de convivencia (Regla III, Cero Solapes).

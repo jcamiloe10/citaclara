@@ -32,7 +32,7 @@ Convenciones:
 
 | Resultado | Estado HTTP | Contenido | Efecto |
 |---|---|---|---|
-| `cancelada` | 200 | "Tu cita queda cancelada. Gracias por avisar." con los datos de la cita | Cita `reservada → cancelada`, `cancelada_en` anotado, hueco libre. |
+| `cancelada` | 200 | "Tu cita queda cancelada. Gracias por avisar." con los datos de la cita | Cita `reservada → cancelada` con `cancelada_por_paciente = 1`, hueco libre. |
 | `ya_cancelada` (repetir la operación, FR-013) | 200 | "Esta cita ya está cancelada." | Ninguno. |
 | `no_reservada` | 200 | "Esta cita ya no se puede cancelar." | Ninguno. |
 | `sin_margen` | 200 | "Ya no se puede cancelar desde aquí. Llama a la clínica" (con teléfono si lo hay) | Ninguno. |
@@ -43,10 +43,10 @@ Notas:
 - El margen de 24 h es inclusivo: a exactamente 24 h aún se puede cancelar.
 - Si la cancelación coincide con otra operación sobre la misma cita (recepción, otra apertura del mismo enlace), solo una gana; la otra recibe `ya_cancelada` o `no_reservada`. Nunca queda un solape (los únicos cambios que hace son liberar el hueco).
 
-## Vista de recepción (cambio en la agenda del día de la 001)
+## Vista de recepción (agenda del día de la 001, con las etiquetas de la 002)
 
 Sin rutas nuevas. En `/agenda` de la 001:
 
-- Una cita `cancelada` cuyo recordatorio tiene `cancelada_en` muestra la etiqueta "Cancelada por el paciente" (texto + icono) junto a su estado, en el histórico del día.
+- Una cita cancelada desde este enlace se guarda con `cancelada_por_paciente = 1` (la misma función de la 002) y la agenda ya la muestra con la etiqueta "Cancelada por el paciente" (texto + icono) en el histórico del día; no se añade ninguna etiqueta propia.
 - Una cita `reservada` cuyo recordatorio es `sin_email` muestra la etiqueta "Sin email: sin recordatorio" (texto + icono), para que recepción pueda llamar al paciente.
 - El resto de la pantalla no cambia.

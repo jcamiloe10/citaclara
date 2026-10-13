@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Borrador (clarificada con Sara, 2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`)
+**Status**: Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas · Se implementa sobre la 002 (ver Assumptions)
 
 **Input**: User description: "Recordatorios de cita. El dolor número uno del cliente piloto: la no asistencia. Alcance: un proceso diario genera un recordatorio por email para cada cita reservada de las próximas 24-48 horas, sin duplicar envíos; el email incluye los datos de la cita y una forma de que el paciente cancele si no va a ir (mejor un hueco libre que un no-show). Correo en modo simulado sin SMTP configurado: se escriben ficheros .eml en datos/salida-correo/. Preguntas cerradas para Sara: antelación exacta, qué pasa si el paciente cancela desde el email y con cuánta antelación puede, y si el recordatorio se reenvía cuando la cita se mueve. Fuera de alcance v1: SMS y WhatsApp."
 
@@ -63,7 +63,7 @@ El email incluye un enlace personal. Al abrirlo, el paciente ve los datos de su 
 
 Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse con un recordatorio obsoleto ni recibir información contradictoria. Regla acordada con Sara: una cita movida se trata como cualquier otra cita (ver FR-018).
 
-**Why this priority**: Evita avisos erróneos, pero es un caso menos frecuente que los dos anteriores y su comportamiento depende de una decisión de negocio abierta.
+**Why this priority**: Evita avisos erróneos, pero es un caso menos frecuente que los dos anteriores y su regla ya está acordada con Sara.
 
 **Independent Test**: Cancelar una cita con recordatorio ya generado y reservar otra para el mismo paciente en otro hueco; comprobar que el enlace del recordatorio antiguo ya no cancela la cita nueva y que la cita nueva se trata según la regla acordada.
 
@@ -113,7 +113,7 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 - **FR-013**: Repetir la apertura o la confirmación del mismo enlace MUST ser inocuo: el resultado es siempre "la cita está cancelada" o "no se puede cancelar", sin efectos adicionales.
 - **FR-014**: La cancelación desde el enlace MUST NOT poder crear nunca un solape (Principio III): solo libera ocupación, y si coincide con otra operación sobre la misma cita o el mismo hueco, el resultado es consistente.
 - **FR-015**: Un enlace inválido, caducado o de una cita inexistente MUST mostrar un mensaje genérico que no revele si la cita existe ni datos de ningún paciente.
-- **FR-016**: Recepción MUST ver en la agenda del día que una cita fue cancelada, y el sistema MUST conservar de forma consultable que la cancelación vino del paciente a través del recordatorio (no de recepción).
+- **FR-016**: Recepción MUST ver en la agenda del día que una cita fue cancelada por el paciente (no por recepción), con la misma etiqueta "Cancelada por el paciente" que usa la 002 (su FR-017); la cancelación hecha desde el enlace del recordatorio MUST registrarse con ese mismo origen.
 
 #### Cambios de cita
 
@@ -135,7 +135,7 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 
 - **Recordatorio**: aviso a un paciente sobre una cita concreta. Atributos: cita, destinatario, instante de generación, resultado (generado, no recordada por falta de email, fallido) y contenido. Como máximo uno por cita (por hora de inicio de la cita, FR-018).
 - **Enlace de cancelación**: acceso personal a una única cita, incluido en el recordatorio. Permite ver sus datos y confirmar su cancelación; no da acceso a ningún otro dato.
-- **Cita** (de la 001): se amplía con el origen de la cancelación (paciente desde un recordatorio, o recepción).
+- **Cita** (de la 001): sin cambios propios; el origen de la cancelación (paciente o recepción) es el dato que añade la 002 y esta spec reutiliza.
 - **Paciente** (de la 001): su email es el destino del recordatorio; sin email válido no hay recordatorio.
 
 ## Success Criteria *(mandatory)*
@@ -158,10 +158,10 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 - **Datos personales**: el email contiene datos personales (nombre, profesional, servicio) de un entorno sanitario; se incluye el mínimo necesario para identificar la cita y ningún dato clínico. Un análisis de protección de datos más amplio queda para una spec propia si el cliente piloto lo requiere.
 - **Zona horaria**: todas las horas se interpretan y muestran en hora de España peninsular (con cambio estacional de hora).
 - **Proceso diario**: se ejecuta una vez al día, todos los días de la semana incluidos sábado y domingo (los avisos de las citas del lunes se generan el domingo), antes de la apertura de la clínica; cómo se programa se decide en el plan. Debe poder ejecutarse también bajo demanda, con un instante de referencia fijado, para pruebas y demostración.
-- **Teléfono de la clínica**: la 001 no guarda el teléfono de la clínica; esta spec añade ese dato de la clínica (necesario para FR-009 y FR-012) y la carga de demostración lo incluye.
+- **Teléfono de la clínica**: es el dato que añade la 002 (`clinica.telefono`); esta spec lo reutiliza para FR-009 y FR-012 y no define otro.
 - **Modo simulado**: sin servicio de correo configurado es el modo por defecto; el envío real queda fuera de la v1 salvo que Sara y el cliente piloto lo pidan en una spec posterior.
 - **Sin reprogramación**: la 001 no permite editar ni reprogramar una cita; "mover" una cita equivale a cancelar y crear otra. La regla de Sara ("como cualquier otra") cubre ese flujo y una futura reprogramación real.
-- **Ampliación de la 001**: la 001 no distingue quién cancela una cita ni guarda marcas de recordatorio; esta spec exige conservar ambas cosas (FR-004, FR-016). Se declara en `specs/MAPA.md`.
-- **Relación con la 002 (portal del paciente)**: si el portal también ofrece cancelación al paciente, ambas specs deben compartir la misma regla de antelación mínima y el mismo cambio de estado; sus propietarios lo acuerdan antes de implementar.
+- **Reutiliza las adiciones de la 002**: el origen de la cancelación (FR-016) y el teléfono de la clínica son los que añade la 002 a la 001; esta spec solo aporta la tabla de recordatorios (FR-004) y no vuelve a ampliar ninguna tabla de la 001.
+- **Relación con la 002 (portal del paciente)**: la 002 (aprobada el 2026-10-13, propietario Camilo) permite cancelar con el mismo plazo de 24 h y la misma transición `reservada → cancelada`. Acordado: **la 003 se implementa después de la 002** y cancela con la misma regla de cancelación del paciente (misma función de dominio), el mismo origen de cancelación y la misma etiqueta "Cancelada por el paciente" en la agenda de recepción; no duplica reglas. Los accesos son distintos: la 002 usa un enlace personal por paciente que entrega recepción; la 003 usa un enlace por cita incluido en el recordatorio. Relación declarada en `specs/MAPA.md`, en la 001 y en la 002.
 - **Fuera de alcance de la v1**: SMS, WhatsApp, reprogramación por parte del paciente, varios recordatorios por cita, confirmación de asistencia, lista de espera para reutilizar el hueco liberado y envío real de email.
 - **Gobierno (Constitución, Principio I)**: el propietario de esta spec es Camilo, según `specs/MAPA.md`. Cumple los Principios II (horas inequívocas), III (cancelar solo libera hueco, FR-014/SC-004), IV (alcance acotado, FR-022), V (SC-001), VI (SC-008), VII y VIII (FR-007/008, SC-007).

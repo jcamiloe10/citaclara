@@ -29,13 +29,13 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 - **Orden dentro de la transacción**: componer el mensaje y su token → escribir el `.eml` (atómico) → guardar la fila `generado`. Si escribir falla, se guarda la fila `fallido` con el motivo (no se da por recordada) y se sigue con la siguiente cita (FR-005). Si el proceso muere entre escribir y guardar, no hay fila: la siguiente ejecución regenera el mismo fichero (mismo nombre, token nuevo) y el enlace anterior deja de valer, sin duplicados.
 - **Alternativas**: marcar la cita antes de escribir (si fallase la escritura, la cita quedaría "recordada" sin fichero, contra FR-005); solo la restricción única (provocaría error en vez de omitir de forma limpia).
 
-## D5. Cancelación por enlace
+## D5. Cancelación por enlace (reutiliza la 002)
 
-- **Decisión**: función de dominio `cancelarPorEnlace(db, token, ahora)` con una única transacción inmediata: localizar el recordatorio por la huella del token → comprobar que la cita sigue con el mismo `inicio` que cuando se generó el recordatorio (FR-017) → comprobar `estado = 'reservada'` → comprobar `inicio - ahora >= 24 h` (inclusive, FR-012) → `UPDATE cita SET estado = 'cancelada' WHERE id = ? AND estado = 'reservada'` y anotar `cancelada_en` en el recordatorio. Cualquier otra rama devuelve un código de rechazo sin cambiar nada.
-- **Por qué no reutilizar `cambiarEstado` de la 001**: abre su propia transacción inmediata y las transacciones no se anidan; llamarlo fuera de la transacción dejaría la cancelación y la anotación del origen como dos pasos (FR-016 podría perderse si el proceso muere entre ambos). Se repite una sola sentencia `UPDATE`, con la misma condición de estado que la 001.
-- **Cero solapes (Principio III)**: la transición `reservada → cancelada` solo libera ocupación; no puede crear solape y los disparadores de la 001 siguen activos. La prueba de concurrencia lanza cancelaciones por enlace y altas del mismo hueco desde procesos distintos y comprueba que nunca hay dos citas activas solapadas.
-- **Idempotencia (FR-013)**: repetir devuelve `ya_cancelada` sin tocar nada.
-- **Alternativas**: dos pasos separados (cancelar y luego anotar); comprobar el margen en la ruta HTTP en lugar del dominio (la regla se probaría solo por HTTP).
+- **Decisión**: la 003 **no reimplementa** la regla de cancelación del paciente: la ejecuta la función `cancelarComoPaciente(db, { pacienteId, clinicaId, citaId }, ahora)` de la 002 (`src/domain/portal.js`), que ya comprueba cita reservada, margen de 24 h inclusivo, transición `reservada → cancelada` y `cancelada_por_paciente = 1` en una transacción inmediata. Solo se añade `cancelarPorEnlace(db, secreto, ahora)` en `src/domain/recordatorios.js`: resuelve el recordatorio por la huella del secreto, comprueba `resultado = 'generado'` y `cita.inicio = recordatorio.inicio_cita` (FR-017), toma `pacienteId`, `clinicaId` y `citaId` de la cita y llama a la función de la 002. Traduce sus códigos a los de la 003 (`cancelada`, `ya_cancelada`, `no_reservada`, `sin_margen`, `no_valido`). La lectura previa (`consultarEnlace`) es solo de consulta.
+- **Por qué**: una única regla de cancelación del paciente para los dos accesos (portal y email) evita que diverjan el plazo, el origen de la cancelación y los mensajes (spec, Assumptions; Principio IV). El cero solapes (Principio III) lo sigue garantizando esa única función y los disparadores de la 001: la transición solo libera ocupación.
+- **Atomicidad**: la comprobación `cita.inicio = recordatorio.inicio_cita` se hace antes de llamar a la función de la 002 y no en su misma transacción. Es seguro porque ni la 001 ni la 002 permiten cambiar la hora de una cita; si una spec futura lo permite, esta comprobación debe pasar a la misma transacción (anotado para esa spec).
+- **Idempotencia (FR-013)**: repetir devuelve `ya_cancelada` sin tocar nada (lo da la función de la 002).
+- **Alternativas**: reimplementar la cancelación en la 003 (dos reglas que mantener y una segunda etiqueta de origen); abrir el portal de la 002 desde el email (el secreto del portal solo se conoce en claro al crearlo y no puede ir en un email que se genera después).
 
 ## D6. El enlace y la página pública
 
@@ -43,17 +43,17 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 - **Por qué dos pasos**: un `GET` nunca cambia nada, así que los escáneres de enlaces de los gestores de correo no pueden cancelar citas por accidente (FR-010).
 - **Alternativas**: cancelar directamente al abrir (riesgo de cancelaciones por escáneres); firmar el enlace con HMAC en vez de guardar el token (no permitiría invalidarlo al cambiar la cita sin guardar estado igualmente).
 
-## D7. Token del enlace
+## D7. Secreto del enlace (formato de la 002)
 
-- **Decisión**: 32 bytes aleatorios de `crypto.randomBytes`, codificados en base64url (43 caracteres). En la base solo se guarda su huella SHA-256 (hex) con índice único; el token en claro solo existe en el `.eml`. Sin caducidad por tiempo: deja de valer cuando la cita deja de estar reservada o cambia su hora de inicio.
-- **Por qué**: 256 bits no son adivinables, no contienen datos personales (edge case de la spec) ni permiten deducir otra cita (FR-010), y guardar solo la huella evita que una copia de la base permita cancelar citas. Como el token es aleatorio de entropía alta, una huella SHA-256 sin sal es suficiente (no es una contraseña).
-- **Alternativas**: id de cita firmado (permite probar ids y no se invalida al mover la cita); UUID v4 (menos entropía que 32 bytes y sin ventaja).
+- **Decisión**: se usa el mismo formato de la 002: 32 bytes aleatorios de `crypto.randomBytes` en base64url (43 caracteres), validados con `FORMATO_SECRETO` y con huella `huellaDeSecreto` (SHA-256 en hexadecimal) de `src/domain/enlaces.js`. Si ese módulo aún no expone un generador de secretos reutilizable, se extrae allí (cambio mínimo, sin duplicar código). En la base solo se guarda la huella (`recordatorio.token_huella`, índice único); el secreto en claro solo existe en el `.eml`. Sin caducidad por tiempo: deja de valer cuando la cita deja de estar reservada o cambia su hora de inicio.
+- **Por qué**: 256 bits no son adivinables, no contienen datos personales (edge case de la spec) ni permiten deducir otra cita (FR-010), y guardar solo la huella evita que una copia de la base permita cancelar citas. Es la misma elección que la 002, con las mismas pruebas.
+- **Alternativas**: id de cita firmado (permite probar ids y no se invalida al mover la cita); un módulo de enlaces propio (duplicaría el de la 002).
 
-## D8. Teléfono de la clínica
+## D8. Teléfono de la clínica (de la 002)
 
-- **Decisión**: tabla nueva `clinica_contacto (clinica_id, telefono)`, cargada por la semilla para la clínica de demostración; la 001 no se modifica. Si una clínica no tiene teléfono, el email y la página dicen "llama a la clínica" sin número (no se inventa).
-- **Por qué**: FR-009 y FR-012 piden indicar cómo contactar. Añadir una columna a `clinica` exigiría migrar bases ya creadas (el esquema de la 001 solo usa `CREATE TABLE IF NOT EXISTS`). No hay pantalla para editarlo: no la pide ninguna spec (Principio IV).
-- **Alternativas**: variable de entorno (no sirve con varias clínicas); columna nueva con `ALTER TABLE` (migración sin necesidad).
+- **Decisión**: se usa `clinica.telefono`, que añade la 002 (y rellena su semilla), con `obtenerClinica` de `src/domain/clinicas.js` y `formatearTelefono` para mostrarlo. La 003 no crea ningún dato de contacto propio. Si una clínica no tiene teléfono (nulo), el email y la página dicen "llama a la clínica" sin número (no se inventa).
+- **Por qué**: FR-009 y FR-012 piden indicar cómo contactar; el dato ya lo introduce la 002, aprobada y anterior en el orden de implementación. Evita una segunda fuente del mismo dato (Principio IV).
+- **Alternativas**: una tabla propia `clinica_contacto` (duplicaría `clinica.telefono`); una variable de entorno (no sirve con varias clínicas).
 
 ## D9. Formato del email
 
@@ -63,7 +63,7 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 
 ## D10. Datos de demostración y cifras esperadas
 
-- **Decisión**: la semilla solo añade el teléfono de la clínica (un dato ficticio de demostración) y, al recargarse, borra antes los recordatorios y el contacto de la clínica (las claves foráneas lo exigen). No cambia ni una cita: los recuentos de la 001 se mantienen.
+- **Decisión**: la 003 no añade datos a la semilla: el teléfono de Clínica Eleva ya lo carga la 002. Solo se amplía el borrado al recargar la semilla (antes de borrar `cita`, borrar los `recordatorio` de la clínica, por las claves foráneas). No cambia ni una cita: los recuentos de la 001 se mantienen.
 - **Cifras para los tests y el quickstart**, calculadas con la semilla y la ancla del lunes 2026-10-12 (reservas del lunes 19 al viernes 30 de octubre): con `ahora` = domingo 2026-10-18 12:00 → **18** recordatorios; con `ahora` = lunes 2026-10-19 12:00 → **19**; con `ahora` = viernes 2026-10-23 12:00 → **0** (la ventana cae en fin de semana); con `ahora` = jueves 2026-10-22 10:00 → **21**.
 - **Por qué**: Principio V: cualquier persona obtiene los mismos números con la misma semilla y el mismo instante.
 
@@ -75,6 +75,6 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 
 ## D12. Qué ve recepción
 
-- **Decisión**: `agendaDelDia` añade a cada cita el estado de su recordatorio (si existe para la misma hora de inicio): origen de la cancelación (`cancelada_en` ≠ nulo) y `sin_email`. La vista muestra, con texto e icono (no solo color): "Cancelada por el paciente" en las citas canceladas desde el enlace y "Sin email: sin recordatorio" en las reservadas sin email. No hay pantalla nueva (FR-016, FR-006, SC-006).
-- **Por qué**: es lo mínimo que piden la spec y SC-006; reutiliza la agenda del día que recepción ya usa.
-- **Alternativas**: una pantalla nueva de "recordatorios" (alcance no pedido).
+- **Decisión**: la etiqueta "Cancelada por el paciente" ya la muestra la agenda del día de la 002 a partir de `cita.cancelada_por_paciente`; al cancelar desde el email se pone a 1 y aparece sin código nuevo (FR-016). La 003 solo añade a `agendaDelDia` si el recordatorio de cada cita reservada es `sin_email` y la etiqueta "Sin email: sin recordatorio", con texto e icono (FR-006, SC-006). No hay pantalla nueva.
+- **Por qué**: es lo mínimo que piden la spec y SC-006; reutiliza la agenda del día y la etiqueta que recepción ya usa.
+- **Alternativas**: una pantalla nueva de "recordatorios" (alcance no pedido); una segunda etiqueta de origen propia (duplicaría la de la 002).
