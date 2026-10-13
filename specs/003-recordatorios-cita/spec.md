@@ -21,7 +21,7 @@
 
 ### User Story 1 - El paciente recibe un recordatorio de su cita (Priority: P1)
 
-Una vez al día, el sistema revisa la agenda de la clínica y envía un email de recordatorio a cada paciente que tiene una cita **reservada** dentro de la ventana de antelación (entre 24 y 48 horas antes del inicio, de modo que quede al menos 24 h para cancelar, ver FR-002 y FR-012). El email, en español de España, indica clínica, profesional, servicio, y día y hora de la cita sin ambigüedad. Un mismo paciente no recibe dos recordatorios por la misma cita aunque el proceso diario se ejecute varias veces.
+Cada día, el sistema revisa la agenda de la clínica y envía un email de recordatorio a cada paciente que tiene una cita **reservada** dentro de la ventana de antelación (entre 24 y 48 horas antes del inicio, de modo que quede al menos 24 h para cancelar, ver FR-002 y FR-012). El email, en español de España, indica clínica, profesional, servicio, y día y hora de la cita sin ambigüedad. Un mismo paciente no recibe dos recordatorios por la misma cita aunque el proceso diario se ejecute varias veces.
 
 **Why this priority**: Es el núcleo del valor: reducir la no asistencia, el dolor número uno del cliente piloto. Con solo esta historia ya se avisa al paciente, aunque todavía no pueda cancelar desde el correo.
 
@@ -78,13 +78,12 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 ### Edge Cases
 
 - **Paciente sin email válido**: no se envía nada y el hecho queda registrado como "no recordada: sin email" para que recepción pueda llamar. No bloquea al resto de pacientes.
-- **Cita reservada tras el último proceso diario** (p. ej. una reserva para mañana hecha esta tarde): si al ejecutarse el proceso la cita empieza en menos de 24 horas, **no recibe recordatorio** (US1-E7); si empieza dentro de la ventana de 24-48 horas, lo recibe una sola vez.
+- **Cita reservada con menos de 24 horas de antelación sobre el proceso** (p. ej. una reserva para mañana hecha esta tarde, o una reserva hecha ya dentro de esas 24 horas): si al ejecutarse el proceso la cita empieza en menos de 24 horas, **no recibe recordatorio** (US1-E7); si empieza dentro de la ventana de 24-48 horas, lo recibe una sola vez.
 - **Proceso diario que no se ejecuta un día** (parada, caída): la siguiente ejecución genera los recordatorios de las citas que entran en su ventana y no tengan uno, sin duplicar los ya generados. Las citas que ya quedan a menos de 24 horas **no se recuperan** (US1-E7): por eso el proceso se programa dos veces antes de la apertura (ver Assumptions) y su resultado se vigila.
 - **Fallo al escribir un recordatorio** (disco lleno, carpeta no accesible): el fallo se registra, no se marca la cita como recordada y la ejecución termina avisando del fallo (código de salida distinto de cero); un fallo no impide procesar el resto de citas. Se reintenta en cualquier ejecución posterior cuya ventana aún incluya la cita (la segunda ejecución del mismo día, o una ejecución manual); pasada esa ventana, la cita ya no se recuerda (US1-E7).
-- **Cita en el cambio de hora** (último domingo de marzo/octubre): la ventana y la hora mostrada al paciente se calculan en hora de España y no se desplazan una hora.
-- **Cita reservada para dentro de menos de 24 horas** en el momento del alta: no recibe recordatorio, por el mismo motivo (US1-E7).
+- **Cita en el cambio de hora** (último domingo de marzo/octubre): la ventana de 24 a 48 horas se mide en horas absolutas (no en horas de reloj), por lo que ese día puede desplazarse una hora respecto al reloj de pared; la fecha y la hora que ve el paciente son siempre las reales de la cita en hora de España.
 - **Dos pacientes con el mismo email** (p. ej. familia): cada cita recibe su propio recordatorio y su propio enlace, que solo cancela esa cita.
-- **El paciente abre el enlace después de la hora de la cita**: no se cancela; se explica que la cita ya ha pasado.
+- **El paciente abre el enlace cuando la cita ya ha empezado o ha pasado**: no se cancela; se le explica que ya no se puede cancelar desde el enlace y que debe llamar a la clínica (el mismo mensaje que con menos de 24 horas).
 - **Datos personales en el enlace o en el nombre de los ficheros**: el enlace no contiene datos de salud ni personales legibles.
 
 ## Requirements *(mandatory)*
@@ -113,7 +112,7 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 - **FR-012**: El paciente MUST poder cancelar desde el enlace solo si la cita empieza dentro de 24 horas o más (inclusive) desde el momento de confirmar (acordado con Sara). Si falta menos, el sistema MUST NOT cancelar y MUST explicar que debe llamar a la clínica, mostrando su teléfono de contacto.
 - **FR-013**: Repetir la apertura o la confirmación del mismo enlace MUST ser inocuo: el resultado es siempre "la cita está cancelada" o "no se puede cancelar", sin efectos adicionales.
 - **FR-014**: La cancelación desde el enlace MUST NOT poder crear nunca un solape (Principio III): solo libera ocupación, y si coincide con otra operación sobre la misma cita o el mismo hueco, el resultado es consistente.
-- **FR-015**: Un enlace inválido, caducado o de una cita inexistente MUST mostrar un mensaje genérico que no revele si la cita existe ni datos de ningún paciente.
+- **FR-015**: Un enlace inválido (inventado, manipulado o que ya no vale porque la cita cambió de hora) o de una cita inexistente MUST mostrar un mensaje genérico que no revele si la cita existe ni datos de ningún paciente.
 - **FR-016**: Recepción MUST ver en la agenda del día que una cita fue cancelada por el paciente (no por recepción), con la misma etiqueta "Cancelada por el paciente" que usa la 002 (su FR-017); la cancelación hecha desde el enlace del recordatorio MUST registrarse con ese mismo origen.
 
 #### Cambios de cita
@@ -147,7 +146,7 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 - **SC-002**: Tras ejecutar el proceso diario 10 veces seguidas (y con ejecuciones simultáneas), el número de recordatorios por cita es 1 en el 100 % de las citas (0 duplicados).
 - **SC-003**: Un paciente sin formación abre el recordatorio en un teléfono móvil y cancela su cita en menos de 1 minuto y como máximo 3 pasos desde que abre el enlace, sin crear cuenta ni contraseña.
 - **SC-004**: El 100 % de las cancelaciones hechas desde un recordatorio dejan el hueco libre y reservable de inmediato, y en ninguna prueba (incluidas cancelaciones y reservas simultáneas sobre el mismo hueco) queda un solape en la agenda de un profesional.
-- **SC-005**: Ningún enlace manipulado, caducado o de otra cita permite cancelar una cita ajena ni revela datos de otro paciente (0 casos en las pruebas de abuso).
+- **SC-005**: Ningún enlace manipulado, que ya no vale o de otra cita permite cancelar una cita ajena ni revela datos de otro paciente (0 casos en las pruebas de abuso).
 - **SC-006**: Recepción identifica en menos de 10 segundos, mirando la agenda del día, qué citas fueron canceladas por el paciente desde el recordatorio y cuáles no pudieron recordarse por falta de email.
 - **SC-007**: Todo texto, fecha y hora del recordatorio y de la pantalla de cancelación están en español de España y sin ambigüedad horaria, incluidas las citas próximas al cambio de hora.
 - **SC-008**: Cada requisito (FR) y cada escenario de aceptación de esta spec tiene al menos una prueba automática que lo referencia (Principio VI).
