@@ -58,6 +58,8 @@ Cobertura que debe pasar, entre otras:
 
 ## 4. Verificación manual de uso
 
+- **Medir SC-003 (origen de las cancelaciones)**: `SELECT SUM(cancelada_por_paciente) AS desde_portal, COUNT(*) AS total FROM cita WHERE estado = 'cancelada' AND inicio >= ?` sobre la base de la clínica; las cancelaciones hechas por teléfono las registra recepción y cuentan con `cancelada_por_paciente = 0`.
+
 - **SC-001**: una persona que no conoce el portal encuentra y cancela una cita en menos de 1 minuto, desde el móvil.
 - **SC-002**: identifica cuál es su próxima cita en menos de 10 segundos.
 - **SC-007 y SC-008**: 375 px sin desplazamiento horizontal; todo texto, fecha y hora en español de España y en hora de España (también en una cita cercana al cambio de hora del domingo 25 de octubre de 2026).

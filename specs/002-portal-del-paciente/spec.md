@@ -45,7 +45,7 @@ El paciente pulsa "Cancelar cita" sobre una cita futura que aún está dentro de
 
 **Why this priority**: Es lo que ahorra a Sonia la mitad de la mañana. Depende de poder ver las citas (P1).
 
-**Independent Test**: Con los datos de demostración, cancelar la cita 805 de Claudia (lunes 5 de octubre, 9:00, Lucía) y comprobar que su estado es "cancelada" y que recepción puede reservar ese hueco.
+**Independent Test**: Con los datos de demostración, cancelar la cita 798 de Claudia (lunes 5 de octubre, 16:30, María) y comprobar que su estado es "cancelada" y que recepción puede reservar ese hueco.
 
 **Acceptance Scenarios**:
 
@@ -81,7 +81,7 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 ### Edge Cases
 
 - Cita futura reservada cuyo inicio ya pasó pero recepción no la ha cerrado: se muestra en el historial con su estado actual y sin acción de cancelar (la cancelación del paciente solo aplica a citas que aún no han empezado y dentro del plazo).
-- Cita que empieza exactamente en el límite del plazo (p. ej. exactamente 24 h antes con la opción B): se puede cancelar; un minuto después, no (el plazo es inclusivo en su límite).
+- Cita que empieza exactamente en el límite del plazo (exactamente 24 h antes): se puede cancelar; un minuto después, no (el plazo es inclusivo en su límite).
 - Cambio de hora de verano a invierno (domingo 25 de octubre de 2026): el plazo se mide en tiempo real transcurrido y las horas se muestran siempre en hora de España, sin ambigüedad.
 - Dos cancelaciones simultáneas de la misma cita (doble toque, dos dispositivos): solo una se aplica; la otra recibe un mensaje claro.
 - Cancelación del paciente a la vez que recepción reserva ese mismo hueco justo al liberarse: nunca queda un solape (Constitución III).
@@ -105,7 +105,7 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 - **FR-006**: La página MUST mostrar dos bloques separados: "Próximas citas" (reservadas cuyo inicio es posterior a ahora, la más cercana primero) e "Historial" (el resto, la más reciente primero).
 - **FR-007**: Cada cita MUST mostrar día y hora (sin ambigüedad y en hora de España), profesional, servicio y estado (reservada, completada, cancelada, no asistida), distinguibles sin depender solo del color. El historial MUST poder recorrerse completo, pero sin mostrar de golpe más de 10 citas (con una acción clara para ver más).
 - **FR-008**: Una cita cancelada, completada o no asistida MUST aparecer en el historial aunque su fecha sea futura (p. ej. cancelada hoy).
-- **FR-009**: La página MUST mostrar el nombre y el teléfono de la clínica de forma permanente, para los casos que el portal no cubre.
+- **FR-009**: La página MUST mostrar de forma permanente el nombre de la clínica y, si la clínica tiene teléfono registrado, su teléfono, para los casos que el portal no cubre. Si la clínica no tiene teléfono, la explicación se limita a "Llama a la clínica" con su nombre.
 - **FR-010**: Un paciente sin citas MUST ver un mensaje claro en lugar de una pantalla vacía.
 
 **Cancelar**

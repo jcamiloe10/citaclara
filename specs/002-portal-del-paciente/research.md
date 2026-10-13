@@ -18,6 +18,7 @@ Decisiones técnicas de la 002. El stack ya lo fijó la 001 y no se cambia (Prin
 
 - **Decisión**: `/p/:secreto` (GET) muestra la página; `/p/:secreto/citas/:id/cancelar` (GET) pide confirmación y (POST) cancela. No leen ni emiten cookies y no usan `exigirSesion`. Todas responden con `Cache-Control: no-store`, `Referrer-Policy: no-referrer` y `X-Robots-Tag: noindex`, y las páginas llevan `<meta name="robots" content="noindex">` (FR-005).
 - **CSRF**: no se añade token. La petición de cancelar solo prospera si el atacante conoce el secreto, y quien conoce el secreto ya puede cancelar sin necesidad de forzar a nadie. Lo que sí se exige es el segundo paso explícito (FR-012): el `GET` nunca cancela.
+- **Errores propios**: dentro de `/p/…` el 404 (subruta desconocida) y el 500 tienen página del portal, sin enlaces a recepción, y el secreto no se registra en ningún mensaje de error del servidor.
 - **Sin JavaScript**: confirmar es una página propia, no un cuadro emergente. Funciona en cualquier móvil y es comprobable por HTTP.
 - **Razón**: Principio IV; reutiliza el modelo "formulario + redirección" de la 001.
 - **Alternativas**: cookie de sesión de paciente tras abrir el enlace (más piezas, y el secreto seguiría en la URL de entrada); `confirm()` de JavaScript (no verificable sin navegador automatizado).
