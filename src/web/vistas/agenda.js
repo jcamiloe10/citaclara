@@ -2,8 +2,8 @@ import { formatoDiaLargo, formatoRango, formatoHora, hoyMadrid, sumarDias } from
 import { textos } from '../textos.js';
 import { esc, pagina } from './base.js';
 
-function insigniaEstado(estado) {
-  const e = textos.estados[estado];
+function insigniaEstado(estado, porPaciente = false) {
+  const e = estado === 'cancelada' && porPaciente ? textos.estados.cancelada_paciente : textos.estados[estado];
   return `<span class="estado estado-${esc(estado)}"><span aria-hidden="true">${e.icono}</span> ${esc(e.texto)}</span>`;
 }
 
@@ -49,7 +49,7 @@ function columna(prof, dia, sesion, ahora, laborable) {
     ? `<details class="historico" open><summary>${esc(textos.agenda.historico)}</summary><ul>${prof.historico
         .map(
           (c) =>
-            `<li>${esc(formatoRango(c.inicio, c.fin))} · ${esc(c.paciente)} · ${esc(c.servicio)} ${insigniaEstado(c.estado)}</li>`,
+            `<li>${esc(formatoRango(c.inicio, c.fin))} · ${esc(c.paciente)} · ${esc(c.servicio)} ${insigniaEstado(c.estado, c.canceladaPorPaciente === 1)}</li>`,
         )
         .join('')}</ul></details>`
     : '';

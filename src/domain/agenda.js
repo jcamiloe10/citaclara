@@ -11,6 +11,7 @@ import {
 
 const SELECT_CITA = `
   SELECT c.id, c.profesional_id AS profesionalId, c.inicio, c.fin, c.estado,
+         c.cancelada_por_paciente AS canceladaPorPaciente,
          s.nombre AS servicio, s.duracion_min AS duracionMin, s.precio_centimos AS precioCentimos,
          p.id AS pacienteId, p.nombre AS paciente
   FROM cita c

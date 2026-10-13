@@ -1,6 +1,6 @@
 # Guía de validación rápida: Portal del paciente
 
-Comprueba de extremo a extremo que la 002 funciona. Los comandos y las rutas son los previstos en el [plan](plan.md); se crean al implementar las tareas.
+Comprueba de extremo a extremo que la 002 funciona.
 
 ## Requisitos previos
 
@@ -13,17 +13,17 @@ Comprueba de extremo a extremo que la 002 funciona. Los comandos y las rutas son
 npm run seed
 ```
 
-Además de lo de la 001, deja el teléfono ficticio de Clínica Eleva y un enlace personal por cada una de las 40 fichas (solo demostración; fórmula en [research.md](research.md), D7). El enlace de Claudia Rodríguez Pérez (ficha 8) se publica aquí al implementar: `http://localhost:3000/p/<secreto-de-la-ficha-8>`. Los recuentos de la 001 no cambian (996 citas).
+Además de lo de la 001, deja el teléfono ficticio de Clínica Eleva y un enlace personal por cada una de las 40 fichas (solo demostración; fórmula en [research.md](research.md), D7). El enlace de Claudia Rodríguez Pérez (ficha 8) es: `http://localhost:3000/p/FGkUJEVddchqH1LYJUsFz8l2LBzQvg4OZOyS6Efg3oQ` (también lo imprime `npm run seed`). Los recuentos de la 001 no cambian (996 citas).
 
 Casos de la spec, con ancla 2026-09-28 (el reloj de las pruebas se fija en jueves 1 de octubre de 2026, 10:00):
 
 | Caso | Dato |
 |---|---|
 | Claudia Rodríguez Pérez (ficha 8) | 39 citas: 10 reservadas, 24 completadas, 3 canceladas, 2 no asistidas |
-| Primera próxima | cita 805: lunes 5 de octubre de 2026, 9:00 · Lucía · Consulta de nutrición |
+| Primera próxima | cita 805: lunes 5 de octubre de 2026, 09:00 · Lucía · Consulta de nutrición |
 | Última próxima | cita 960: jueves 15 de octubre de 2026, 17:45 · María · Sesión de fisioterapia |
 | Dos citas el 15 de octubre | 967 (Jorge, 17:30) y 960 (María, 17:45) |
-| Más reciente del historial | cita 768: viernes 25 de septiembre de 2026, 9:45 · María · Completada |
+| Más reciente del historial | cita 768: viernes 25 de septiembre de 2026, 09:45 · María · Completada |
 | Cancelada | cita 735: miércoles 23 de septiembre de 2026, 11:00 · Jorge · Sesión de fisioterapia |
 | Mismo nombre de pila | Claudia Ruiz Romero (ficha 13) y Claudia Jiménez Ruiz (ficha 26): nunca ven las citas de Claudia Rodríguez Pérez |
 | Plazo, "ahora" = domingo 4 de octubre, 10:00 | cita 798 (lunes 5, 16:30, 30 h 30 min): se puede cancelar; cita 805 (lunes 5, 9:00, 23 h): no |

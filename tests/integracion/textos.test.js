@@ -80,3 +80,60 @@ describe('Textos visibles', () => {
     }
   });
 });
+
+describe('Textos visibles del portal del paciente (002)', () => {
+  let db;
+  let p;
+  let c;
+  beforeEach(async () => {
+    const { entornoConSemilla, iniciarPortal, secretoDemo } = await import('../ayudas/portal.js');
+    const e = entornoConSemilla();
+    db = e;
+    p = await iniciarPortal(e);
+    c = { secretoDemo, e };
+  });
+  afterEach(async () => {
+    await p.cerrar();
+    db.cerrar();
+  });
+
+  it('[002:FR-018][002:SC-008] ninguna página del portal ni la pantalla de pacientes muestra jerga técnica ni fechas numéricas', async () => {
+    const s = c.secretoDemo(8);
+    const paginas = [
+      (await p.get(`/p/${s}`)).cuerpo,
+      (await p.get(`/p/${s}?h=30`)).cuerpo,
+      (await p.get(`/p/${s}/citas/798/cancelar`)).cuerpo,
+      (await p.get(`/p/${'A'.repeat(43)}`)).cuerpo,
+      (await p.get(`/p/${s}/otra-cosa`)).cuerpo,
+      (await p.get(`/p/${s}?aviso=ya-cancelada`)).cuerpo,
+      (await p.get(`/p/${s}?aviso=fuera-de-plazo`)).cuerpo,
+      (await p.get(`/p/${s}?aviso=no-disponible`)).cuerpo,
+    ];
+    await p.post(`/p/${s}/citas/798/cancelar`);
+    paginas.push((await p.get(`/p/${s}?aviso=cancelada&cita=798`)).cuerpo);
+    const recepcion = await iniciarServidor(c.e);
+    try {
+      await recepcion.entrar('eleva-demo');
+      paginas.push((await recepcion.get('/pacientes')).cuerpo);
+      paginas.push((await recepcion.get('/pacientes/8/enlace')).cuerpo);
+      paginas.push((await recepcion.enviar('/pacientes/8/enlace', {})).cuerpo);
+    } finally {
+      await recepcion.cerrar();
+    }
+    for (const html of paginas) {
+      const texto = textoVisible(html);
+      for (const prohibido of PROHIBIDOS) assert.doesNotMatch(texto, prohibido);
+      assert.doesNotMatch(texto, /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/);
+      assert.doesNotMatch(texto, /\b\d{4}-\d{2}-\d{2}\b/);
+      assert.match(html, /<html lang="es">/);
+    }
+  });
+
+  it('[002:FR-018] todos los textos de las vistas nuevas salen de textos.js', async () => {
+    const { readFileSync } = await import('node:fs');
+    for (const f of ['vistas/portal.js', 'vistas/pacientes.js']) {
+      const codigo = readFileSync(new URL(`../../src/web/${f}`, import.meta.url), 'utf8');
+      assert.doesNotMatch(codigo, />\s*[A-ZÁÉÍÓÚ][a-záéíóúñ]+ [a-záéíóúñ]+[^<$]*</, `${f} tiene texto visible escrito en la vista`);
+    }
+  });
+});

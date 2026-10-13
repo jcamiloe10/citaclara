@@ -7,7 +7,7 @@ La 002 no expone una API pública: las rutas son las pantallas del paciente (HTM
 - Ninguna ruta `/p/…` usa la cookie de sesión de recepción ni emite cookies. La credencial es el secreto de la ruta (`<secreto>` = 43 caracteres de `A-Z a-z 0-9 - _`).
 - Todas las respuestas de `/p/…` llevan `Cache-Control: no-store`, `Referrer-Policy: no-referrer` y `X-Robots-Tag: noindex`, y las páginas incluyen `<meta name="robots" content="noindex">` (FR-005).
 - Un secreto con formato incorrecto, desconocido, renovado o de otra clínica produce **la misma respuesta**: 404 con la página "Este enlace no es válido" (FR-003). Esa página no contiene ningún dato de paciente ni de clínica, salvo el texto "Llama a la clínica y te daremos uno nuevo".
-- Fechas y horas: "lunes 5 de octubre de 2026, 9:00", siempre en hora de España. Sin precios.
+- Fechas y horas: "lunes 5 de octubre de 2026, 09:00", siempre en hora de España. Sin precios.
 - Sin JavaScript obligatorio.
 - Dentro de `/p/…` los errores tienen página propia del portal: 404 para cualquier subruta o método desconocido y 500 para un fallo interno, con las mismas cabeceras de privacidad, el texto "Llama a la clínica" y sin enlaces a `/agenda` ni a recepción. Ni la respuesta ni el registro del servidor incluyen el secreto.
 

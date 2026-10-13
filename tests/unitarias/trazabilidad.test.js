@@ -31,3 +31,39 @@ describe('Trazabilidad spec ↔ tests', () => {
     assert.deepEqual(r.sinCobertura, []);
   });
 });
+
+const SPEC_002 = `
+### User Story 1 - Ver (Priority: P1)
+
+**Acceptance Scenarios**:
+
+1. **Given** a, **When** b, **Then** c.
+
+---
+
+## Requirements
+
+- **FR-001**: algo.
+- **FR-008**: esta sí exige test en la 002.
+`;
+
+describe('Trazabilidad de la 002 con prefijo', () => {
+  const opciones = { prefijo: '002:', excluidos: new Set() };
+
+  it('[002:SC-009] falla con los identificadores de la 002 que ningún test referencia con el prefijo', () => {
+    const r = analizar(SPEC_002, "it('[002:FR-001] x');", opciones);
+    assert.deepEqual(r.sinCobertura, ['FR-008', 'US1-E1']);
+  });
+
+  it('[002:SC-009] pasa cuando todos llevan el prefijo, incluido FR-008, que en la 002 no se excluye', () => {
+    const r = analizar(SPEC_002, '[002:FR-001] [002:FR-008] [002:US1-E1]', opciones);
+    assert.deepEqual(r.sinCobertura, []);
+  });
+
+  it('[002:SC-009] una etiqueta sin prefijo (de la 001) no cubre el identificador de la 002 y viceversa', () => {
+    assert.deepEqual(analizar(SPEC_002, '[FR-001] [FR-008] [US1-E1]', opciones).sinCobertura, ['FR-001', 'FR-008', 'US1-E1']);
+    assert.deepEqual(analizar(SPEC, '[002:FR-001] [002:FR-002b] [002:RN1] [002:US1-E1] [002:US1-E2]').sinCobertura, [
+      'FR-001', 'FR-002b', 'FR-016', 'RN1', 'US1-E1', 'US1-E2',
+    ]);
+  });
+});

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas
+**Status**: Implementada (2026-10-13), pendiente de verificación manual de SC-001 y SC-002 · Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas
 
 **Input**: User description: "Portal del paciente. Los pacientes de la clínica quieren ver sus citas y cancelarlas sin llamar por teléfono (Sonia, recepción de Eleva, dedica «la mitad de la mañana» a esto). Un paciente accede a una página personal moderna donde ve sus citas futuras y pasadas y puede cancelar una cita futura. Interfaz limpia y responsive, pensada para móvil. Sin cuentas ni contraseñas. Fuera de alcance v1: reservar o mover citas online, pagos."
 
@@ -30,8 +30,8 @@ Un paciente abre su página personal desde el móvil y ve, de un vistazo, sus pr
 
 **Acceptance Scenarios**:
 
-1. **Given** Claudia Rodríguez Pérez (ficha de Clínica Eleva con 39 citas: 10 reservadas, 24 completadas, 3 canceladas y 2 no asistidas), **When** abre su página, **Then** en "Próximas citas" ve sus 10 reservadas ordenadas por fecha, la primera "lunes 5 de octubre de 2026, 9:00 · Lucía · Consulta de nutrición" y la última "jueves 15 de octubre de 2026, 17:45 · María · Sesión de fisioterapia".
-2. **Given** la misma paciente, **When** mira su historial, **Then** ve sus 29 citas pasadas (24 completadas, 3 canceladas, 2 no asistidas), la más reciente primero: "viernes 25 de septiembre de 2026, 9:45 · María · Sesión de fisioterapia · Completada"; entre ellas, "miércoles 23 de septiembre de 2026, 11:00 · Jorge · Sesión de fisioterapia · Cancelada".
+1. **Given** Claudia Rodríguez Pérez (ficha de Clínica Eleva con 39 citas: 10 reservadas, 24 completadas, 3 canceladas y 2 no asistidas), **When** abre su página, **Then** en "Próximas citas" ve sus 10 reservadas ordenadas por fecha, la primera "lunes 5 de octubre de 2026, 09:00 · Lucía · Consulta de nutrición" y la última "jueves 15 de octubre de 2026, 17:45 · María · Sesión de fisioterapia".
+2. **Given** la misma paciente, **When** mira su historial, **Then** ve sus 29 citas pasadas (24 completadas, 3 canceladas, 2 no asistidas), la más reciente primero: "viernes 25 de septiembre de 2026, 09:45 · María · Sesión de fisioterapia · Completada"; entre ellas, "miércoles 23 de septiembre de 2026, 11:00 · Jorge · Sesión de fisioterapia · Cancelada".
 3. **Given** Claudia tiene dos citas el jueves 15 de octubre (Jorge a las 17:30 y María a las 17:45), **When** abre su página, **Then** ve ambas, sin que se oculte ni se marque ninguna (la 001 solo prohíbe solapes por profesional).
 4. **Given** Claudia Rodríguez Pérez y Claudia Ruiz Romero, dos fichas distintas con el mismo nombre de pila, **When** cada una abre su página, **Then** cada una ve únicamente sus propias citas.
 5. **Given** un paciente sin ninguna cita, **When** abre su página, **Then** ve un mensaje claro ("Todavía no tienes citas") y la forma de contactar con la clínica, no una pantalla vacía.
@@ -120,7 +120,7 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 
 **Interfaz**
 
-- **FR-018**: Todo texto visible MUST estar en español de España, sin jerga técnica, con fechas y horas sin ambigüedad (p. ej. "lunes 5 de octubre de 2026, 9:00") y en hora de España (Constitución II y VIII).
+- **FR-018**: Todo texto visible MUST estar en español de España, sin jerga técnica, con fechas y horas sin ambigüedad (p. ej. "lunes 5 de octubre de 2026, 09:00") y en hora de España (Constitución II y VIII).
 - **FR-019**: La interfaz MUST ser limpia, moderna y plenamente utilizable en un móvil desde 360 píxeles de ancho sin desplazamiento horizontal, con contraste y tamaños de toque accesibles, y igualmente cómoda en un ordenador (Constitución VII).
 - **FR-020**: Los datos de demostración MUST permitir probar el portal sin cambios en su contenido: los recuentos de citas por paciente y estado citados en esta spec deben salir de la semilla (Constitución V).
 

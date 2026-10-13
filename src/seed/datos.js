@@ -1,8 +1,12 @@
 // Datos fijos de la clínica de demostración (FR-030, FR-031).
 export const SEMILLA = 20260927;
 
+import { createHash } from 'node:crypto';
+
 export const CLINICA = {
   nombre: 'Clínica Eleva',
+  // Teléfono ficticio de demostración.
+  telefono: '910123456',
   // Clave de demostración: solo para datos de demostración, nunca para una clínica real.
   clave: 'eleva-demo',
 };
@@ -37,3 +41,10 @@ export const APELLIDOS = [
   'Jiménez', 'Ruiz', 'Hernández', 'Díaz', 'Moreno', 'Muñoz', 'Álvarez', 'Romero', 'Alonso', 'Gutiérrez',
   'Navarro', 'Torres', 'Domínguez', 'Vázquez', 'Ramos', 'Gil', 'Ramírez', 'Serrano', 'Blanco', 'Molina',
 ];
+
+/**
+ * Secreto del enlace personal de la ficha `n` (1–40) de la demostración (002, Principio V).
+ * Determinista y por tanto adivinable: SOLO para datos de demostración, nunca para una clínica real.
+ */
+export const secretoDeDemostracion = (n) =>
+  createHash('sha256').update(`citaclara-demo:${SEMILLA}:${n}`).digest('base64url');

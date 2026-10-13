@@ -34,3 +34,19 @@ export function crearPaciente(db, clinicaId, entrada) {
     .run(clinicaId, v.datos.nombre, v.datos.telefono, v.datos.email);
   return { ok: true, paciente: { id: Number(lastInsertRowid), ...v.datos } };
 }
+
+const sinTildes = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Pacientes de la clínica por nombre, con búsqueda sin distinguir tildes ni mayúsculas (002, FR-004). */
+export function listarPacientes(db, clinicaId, { q = '' } = {}) {
+  const buscado = sinTildes(q).trim();
+  return db
+    .prepare('SELECT id, nombre, telefono, email, acceso_hash IS NOT NULL AS conEnlace FROM paciente WHERE clinica_id = ? ORDER BY nombre, id')
+    .all(clinicaId)
+    .filter((p) => !buscado || sinTildes(p.nombre).includes(buscado))
+    .map((p) => ({ ...p, conEnlace: p.conEnlace === 1, telefonoFormateado: formatearTelefono(p.telefono) }));
+}
+
+export function obtenerPaciente(db, clinicaId, pacienteId) {
+  return db.prepare('SELECT id, nombre, telefono, email, acceso_hash IS NOT NULL AS conEnlace FROM paciente WHERE id = ? AND clinica_id = ?').get(pacienteId, clinicaId) ?? null;
+}
