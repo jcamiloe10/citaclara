@@ -35,6 +35,7 @@ Una vez al día, el sistema revisa la agenda de la clínica y envía un email de
 4. **Given** una cita para la que ya se generó recordatorio, **When** el proceso diario se ejecuta de nuevo (el mismo día o tras un reinicio), **Then** no se genera un segundo recordatorio para esa cita.
 5. **Given** un paciente con dos citas reservadas en la ventana, **When** se ejecuta el proceso diario, **Then** recibe un recordatorio por cada cita, cada uno con sus datos.
 6. **Given** un recordatorio generado, **When** se lee su fecha y hora, **Then** aparece en formato inequívoco ligado a la hora de España (p. ej. "viernes 16 de octubre de 2026, 10:00").
+7. **Given** una cita reservada que, en el momento de ejecutarse el proceso diario, empieza en menos de 24 horas (p. ej. una reserva para mañana hecha esta tarde, o la cita de un día en que el proceso no se ejecutó), **When** se ejecuta el proceso diario, **Then** no se genera recordatorio para ella: ya no queda margen para cancelar desde el email y el paciente se enteró de la cita al reservar.
 
 ---
 
@@ -77,11 +78,11 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 ### Edge Cases
 
 - **Paciente sin email válido**: no se envía nada y el hecho queda registrado como "no recordada: sin email" para que recepción pueda llamar. No bloquea al resto de pacientes.
-- **Cita reservada tras el último proceso diario** y que ya cae dentro de la ventana (p. ej. una reserva para mañana hecha esta tarde): se recoge en la siguiente ejecución mientras siga dentro de la ventana; nunca recibe dos recordatorios.
-- **Proceso diario que no se ejecuta un día** (parada, caída): la siguiente ejecución recupera las citas de la ventana que no tengan recordatorio, sin duplicar los ya generados.
-- **Fallo al escribir un recordatorio** (disco lleno, carpeta no accesible): el fallo se registra y no se marca la cita como recordada, de modo que la siguiente ejecución lo reintente; un fallo no impide procesar el resto de citas.
+- **Cita reservada tras el último proceso diario** (p. ej. una reserva para mañana hecha esta tarde): si al ejecutarse el proceso la cita empieza en menos de 24 horas, **no recibe recordatorio** (US1-E7); si empieza dentro de la ventana de 24-48 horas, lo recibe una sola vez.
+- **Proceso diario que no se ejecuta un día** (parada, caída): la siguiente ejecución genera los recordatorios de las citas que entran en su ventana y no tengan uno, sin duplicar los ya generados. Las citas que ya quedan a menos de 24 horas **no se recuperan** (US1-E7): por eso el proceso se programa dos veces antes de la apertura (ver Assumptions) y su resultado se vigila.
+- **Fallo al escribir un recordatorio** (disco lleno, carpeta no accesible): el fallo se registra, no se marca la cita como recordada y la ejecución termina avisando del fallo (código de salida distinto de cero); un fallo no impide procesar el resto de citas. Se reintenta en cualquier ejecución posterior cuya ventana aún incluya la cita (la segunda ejecución del mismo día, o una ejecución manual); pasada esa ventana, la cita ya no se recuerda (US1-E7).
 - **Cita en el cambio de hora** (último domingo de marzo/octubre): la ventana y la hora mostrada al paciente se calculan en hora de España y no se desplazan una hora.
-- **Cita reservada para dentro de menos de 24 horas** en el momento del alta: se trata en la siguiente ejecución si está dentro de la ventana; la regla exacta depende de la antelación acordada (FR-002).
+- **Cita reservada para dentro de menos de 24 horas** en el momento del alta: no recibe recordatorio, por el mismo motivo (US1-E7).
 - **Dos pacientes con el mismo email** (p. ej. familia): cada cita recibe su propio recordatorio y su propio enlace, que solo cancela esa cita.
 - **El paciente abre el enlace después de la hora de la cita**: no se cancela; se explica que la cita ya ha pasado.
 - **Datos personales en el enlace o en el nombre de los ficheros**: el enlace no contiene datos de salud ni personales legibles.
@@ -94,9 +95,9 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 
 - **FR-001**: El sistema MUST disponer de un proceso diario que, para cada clínica, genera un recordatorio por email por cada cita **reservada** que cumpla la ventana de FR-002 y cuyo paciente tenga un email válido.
 - **FR-002**: La ventana de recordatorio MUST cubrir las citas cuyo inicio cae entre 24 y 48 horas desde el instante de la ejecución. Acordado con Sara: antelación de 24 h. Como la cancelación exige 24 h de margen (FR-012), el aviso sale siempre con la cita a 24 h o más; cada cita se avisa una sola vez dentro de la ventana.
-- **FR-003**: El sistema MUST NOT generar recordatorio para citas que no estén en estado "reservada" (completada, cancelada, no asistida) ni para citas fuera de la ventana.
+- **FR-003**: El sistema MUST NOT generar recordatorio para citas que no estén en estado "reservada" (completada, cancelada, no asistida) ni para citas fuera de la ventana. En particular, una cita que en el momento de la ejecución empieza en menos de 24 horas no recibe recordatorio (no hay margen para cancelar, FR-012).
 - **FR-004**: El sistema MUST recordar qué citas ya tienen recordatorio generado y MUST NOT generar un segundo recordatorio para la misma cita aunque el proceso se ejecute varias veces, se reinicie o se ejecute de forma concurrente.
-- **FR-005**: Si la generación del recordatorio de una cita falla, el sistema MUST registrar el fallo, MUST NOT dar la cita por recordada y MUST reintentarla en la siguiente ejecución, sin que ese fallo impida procesar el resto de citas.
+- **FR-005**: Si la generación del recordatorio de una cita falla, el sistema MUST registrar el fallo, MUST NOT dar la cita por recordada, MUST avisar a quien lo ejecuta con un resultado de error y MUST reintentarla en cualquier ejecución posterior cuya ventana aún incluya la cita, sin que ese fallo impida procesar el resto de citas.
 - **FR-006**: Si el paciente de una cita no tiene un email válido, el sistema MUST NOT enviar nada y MUST dejar constancia visible para recepción de que esa cita no pudo recordarse por falta de email.
 
 #### Contenido del email
@@ -157,7 +158,7 @@ Cuando una cita cambia de hora o de profesional, el paciente no debe quedarse co
 - **Usuarios**: el paciente solo interactúa con el email y con la pantalla de cancelación del enlace; recepción sigue siendo la única usuaria con acceso a la agenda (clave de clínica, 001). El paciente no tiene cuenta ni portal propio en esta spec.
 - **Datos personales**: el email contiene datos personales (nombre, profesional, servicio) de un entorno sanitario; se incluye el mínimo necesario para identificar la cita y ningún dato clínico. Un análisis de protección de datos más amplio queda para una spec propia si el cliente piloto lo requiere.
 - **Zona horaria**: todas las horas se interpretan y muestran en hora de España peninsular (con cambio estacional de hora).
-- **Proceso diario**: se ejecuta una vez al día, todos los días de la semana incluidos sábado y domingo (los avisos de las citas del lunes se generan el domingo), antes de la apertura de la clínica; cómo se programa se decide en el plan. Debe poder ejecutarse también bajo demanda, con un instante de referencia fijado, para pruebas y demostración.
+- **Proceso diario**: se ejecuta todos los días de la semana incluidos sábado y domingo (los avisos de las citas del lunes se generan el domingo), **dos veces antes de la apertura de la clínica** (p. ej. a las 06:30 y a las 08:00): la segunda ejecución sirve de reintento automático de la primera, porque las ejecuciones son idempotentes. Cómo se programa se decide en el plan. Debe poder ejecutarse también bajo demanda, con un instante de referencia fijado, para pruebas y demostración. Consecuencia aceptada: las reservas hechas con menos de 24 horas de antelación sobre el último proceso no reciben recordatorio (US1-E7) [pendiente de confirmar con Sara].
 - **Teléfono de la clínica**: es el dato que añade la 002 (`clinica.telefono`); esta spec lo reutiliza para FR-009 y FR-012 y no define otro.
 - **Modo simulado**: sin servicio de correo configurado es el modo por defecto; el envío real queda fuera de la v1 salvo que Sara y el cliente piloto lo pidan en una spec posterior.
 - **Sin reprogramación**: la 001 no permite editar ni reprogramar una cita; "mover" una cita equivale a cancelar y crear otra. La regla de Sara ("como cualquier otra") cubre ese flujo y una futura reprogramación real.

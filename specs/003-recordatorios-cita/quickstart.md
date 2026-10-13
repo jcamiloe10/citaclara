@@ -33,7 +33,7 @@ Debe mostrar "modo simulado", "Generados: 18" y la carpeta `datos/salida-correo/
 2. **Sin duplicados** (US1-E4, SC-002): ejecutar de nuevo el mismo comando → "Generados: 0" y "Ya recordadas antes: 18"; siguen siendo 18 ficheros. Repetirlo 10 veces seguidas, y lanzar dos a la vez, sin cambiar el recuento.
 3. **Fuera de la ventana** (US1-E2, E3): con `--ahora=2026-10-23T12:00` no se genera nada. Una cita ya cancelada, completada o no asistida dentro de la ventana no recibe recordatorio.
 4. **Paciente sin email** (FR-006): dar de alta una cita con un paciente nuevo sin email válido es imposible por la interfaz (la 001 valida el email); la prueba lo fuerza en la base y comprueba "Sin email: 1", ningún fichero para esa cita y la etiqueta en la agenda.
-5. **Fallo de escritura** (FR-005): con una carpeta de salida no escribible, el comando termina con código 1, deja la cita como fallida y la siguiente ejecución, ya con la carpeta arreglada, la genera.
+5. **Fallo de escritura** (FR-005): con una carpeta de salida no escribible, el comando termina con código 1, deja la cita como fallida y una ejecución posterior cuya ventana aún incluya la cita (con la carpeta ya arreglada) la genera. Con `--ahora` 24 h 1 min antes de la cita funciona; con `--ahora` 23 h 59 min antes ya no se recuerda (US1-E7).
 
 ## 3. Cancelar desde el enlace (historia 2)
 
@@ -65,4 +65,4 @@ Las pruebas de la 003 están en `tests/recordatorios/` (unitarias, integración 
 
 ## 6. Programar el proceso diario (documentado en el README)
 
-Una vez al día, todos los días de la semana, antes de las 09:00. Ejemplo para Windows y para `cron` en el README al implementar; recordar que el domingo es necesario para avisar de las citas del lunes.
+Dos veces al día (p. ej. 06:30 y 08:00), todos los días de la semana, antes de las 09:00. Ejemplo para Windows y para `cron` en el README al implementar; recordar que el domingo es necesario para avisar de las citas del lunes.

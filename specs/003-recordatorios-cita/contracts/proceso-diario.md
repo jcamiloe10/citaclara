@@ -50,4 +50,4 @@ Los números del ejemplo son los de [quickstart.md](../quickstart.md). La palabr
 
 ## Programación recomendada
 
-Una vez al día, **todos los días de la semana** (sábado y domingo incluidos), antes de las 09:00 hora de España (p. ej. 07:00). Las citas del lunes solo entran en la ventana de la ejecución del domingo (plan, decisión 1). El README documenta la orden del Programador de tareas de Windows y la línea de `cron`.
+Dos veces al día (p. ej. 06:30 y 08:00), **todos los días de la semana** (sábado y domingo incluidos), antes de las 09:00 hora de España. La segunda ejecución reintenta lo que fallara en la primera y recoge reservas de última hora; ambas son idempotentes. Las citas del lunes solo entran en la ventana de las ejecuciones del domingo (plan, decisión 1). Una cita que ya queda a menos de 24 h no recibe recordatorio (spec US1-E7). El README documenta la orden del Programador de tareas de Windows y la línea de `cron`.

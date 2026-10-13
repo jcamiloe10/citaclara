@@ -4,7 +4,7 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 
 ## D1. Cómo se ejecuta el proceso diario
 
-- **Decisión**: un comando independiente, `npm run recordatorios` (`src/recordatorios/ejecutar.js`), que abre la base, procesa la ventana y termina. Lo programa el sistema operativo (Programador de tareas de Windows o `cron`) una vez al día, **todos los días**. Admite `--ahora=AAAA-MM-DDTHH:MM` (hora de España) para fijar el instante en pruebas y demostraciones.
+- **Decisión**: un comando independiente, `npm run recordatorios` (`src/recordatorios/ejecutar.js`), que abre la base, procesa la ventana y termina. Lo programa el sistema operativo (Programador de tareas de Windows o `cron`) **dos veces al día, todos los días** antes de las 09:00 (la segunda ejecución reintenta la primera). Admite `--ahora=AAAA-MM-DDTHH:MM` (hora de España) para fijar el instante en pruebas y demostraciones.
 - **Por qué**: la spec pide "un proceso diario" y poder ejecutarlo bajo demanda con instante fijado. Un comando es lo más simple (Principio IV), se prueba sin servidor y sobrevive a reinicios del servidor web.
 - **Alternativas**: un temporizador dentro del servidor Express (se duplicaría si hay dos procesos del servidor y dejaría de ejecutarse si el servidor está parado); una dependencia de planificación (alcance fantasma).
 - **Consecuencia**: hay que ejecutarlo también sábado y domingo (ver plan, decisión 1).
