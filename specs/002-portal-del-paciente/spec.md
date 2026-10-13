@@ -73,7 +73,7 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 1. **Given** el enlace personal válido de Claudia Rodríguez Pérez, **When** lo abre en el móvil, **Then** ve su página sin teclear nada.
 2. **Given** un enlace inventado, manipulado o renovado por recepción (el antiguo), **When** se abre, **Then** se muestra el mensaje "Este enlace no es válido. Llama a la clínica y te daremos uno nuevo", sin revelar ningún dato ni si la persona existe.
 3. **Given** el enlace de Claudia, **When** se altera un solo carácter, **Then** no se muestran datos de ninguna otra paciente.
-4. **Given** recepción, **When** renueva el enlace de un paciente, **Then** el anterior deja de funcionar al instante y el nuevo funciona; la acción es visible en la ficha del paciente para recepción.
+4. **Given** recepción, **When** renueva el enlace de un paciente, **Then** el anterior deja de funcionar al instante y el nuevo funciona; recepción ve en la pantalla de pacientes si cada paciente tiene ya enlace.
 5. **Given** que la página del paciente está abierta, **When** la abre un buscador u otra persona sin el enlace, **Then** nada de su contenido es accesible ni indexable.
 
 ---
@@ -97,7 +97,7 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 - **FR-001**: El sistema MUST dar a cada paciente una página personal a la que se accede sin crear cuenta ni contraseña, mediante un enlace personal secreto (ver Clarifications).
 - **FR-002**: El sistema MUST mostrar a cada paciente únicamente las citas de su propia ficha; ningún acceso válido, inválido o manipulado puede mostrar datos de otro paciente ni de otra clínica.
 - **FR-003**: Un acceso inválido, caducado o renovado MUST mostrar un mensaje claro en español sin revelar datos ni si el paciente existe.
-- **FR-004**: Recepción MUST poder entregar a un paciente su enlace personal y renovarlo (invalidando el anterior al instante) desde la ficha del paciente en la interfaz de recepción.
+- **FR-004**: Recepción MUST poder crear el enlace personal de un paciente y renovarlo (invalidando el anterior al instante) desde una pantalla de pacientes de la interfaz de recepción. El enlace completo se muestra a recepción en el momento de crearlo o renovarlo, para que lo copie y se lo entregue al paciente; después no vuelve a mostrarse (si se pierde, se renueva).
 - **FR-005**: La página personal MUST NOT ser indexable ni compartir contenido de citas con terceros más allá del propio paciente.
 
 **Ver citas**
