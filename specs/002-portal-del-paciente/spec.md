@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Borrador · decisiones de Sara incorporadas (2026-10-13) · Propietario: por asignar (ver `specs/MAPA.md`)
+**Status**: Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas
 
 **Input**: User description: "Portal del paciente. Los pacientes de la clínica quieren ver sus citas y cancelarlas sin llamar por teléfono (Sonia, recepción de Eleva, dedica «la mitad de la mañana» a esto). Un paciente accede a una página personal moderna donde ve sus citas futuras y pasadas y puede cancelar una cita futura. Interfaz limpia y responsive, pensada para móvil. Sin cuentas ni contraseñas. Fuera de alcance v1: reservar o mover citas online, pagos."
 
@@ -157,4 +157,4 @@ El paciente llega a su página personal sin registrarse y sin recordar ninguna c
 - **Sin avisos**: el portal no envía recordatorios, confirmaciones ni avisos por email; el enlace lo entrega recepción y el paciente ve la confirmación en pantalla.
 - **Hora de España**: todas las horas se interpretan y muestran en hora de España peninsular, con el cambio estacional.
 - **Fuera de alcance de la 002 (v1)**: reservar o mover citas online, pagos, editar los datos de la ficha desde el portal, recordatorios y analítica.
-- **Gobierno (Constitución, Principio I)**: la spec está en borrador y sin propietario asignado en `specs/MAPA.md`, por lo que no puede implementarse todavía. Cumplimiento previsto: II (horas sin ambigüedad), III (SC-005, pruebas de cancelación simultánea), IV (alcance mínimo: ver y cancelar), V (FR-020), VI (SC-009), VII y VIII (FR-018/019).
+- **Gobierno (Constitución, Principio I)**: el propietario de esta spec es Camilo, según `specs/MAPA.md`, y la spec está aprobada desde el 2026-10-13, incluida la convivencia con la 001. Cumplimiento previsto: II (horas sin ambigüedad), III (SC-005, pruebas de cancelación simultánea), IV (alcance mínimo: ver y cancelar), V (FR-020), VI (SC-009), VII y VIII (FR-018/019).

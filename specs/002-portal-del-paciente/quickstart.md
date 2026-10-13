@@ -1,6 +1,6 @@
 # Guía de validación rápida: Portal del paciente
 
-Comprueba de extremo a extremo que la 002 funciona. Los comandos y las rutas son los previstos en el [plan](plan.md); se crean al implementar las tareas. **No se implementa hasta que `specs/MAPA.md` tenga propietario de la 002 y Camilo apruebe la convivencia con la 001.**
+Comprueba de extremo a extremo que la 002 funciona. Los comandos y las rutas son los previstos en el [plan](plan.md); se crean al implementar las tareas.
 
 ## Requisitos previos
 

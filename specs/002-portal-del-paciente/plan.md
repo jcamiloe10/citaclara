@@ -34,7 +34,7 @@ Página personal del paciente, sin cuentas ni contraseñas, donde ve sus próxim
 
 | Principio | Cumplimiento | Dónde |
 |---|---|---|
-| I. Spec First | Spec en `specs/002-portal-del-paciente/` con las decisiones de Sara incorporadas. **Pendiente: propietario sin asignar en `specs/MAPA.md` y aprobación de Camilo de la convivencia con la 001.** El plan puede elaborarse, pero **no se implementa** hasta cerrarlo. | [spec.md](spec.md) (Status), `specs/MAPA.md` |
+| I. Spec First | Spec en `specs/002-portal-del-paciente/` con las decisiones de Sara incorporadas. Propietario (Camilo) y convivencia con la 001 aprobados el 2026-10-13 en `specs/MAPA.md`. | [spec.md](spec.md) (Status), `specs/MAPA.md` |
 | II. Precisión numérica y temporal | El plazo de 24 h se mide entre instantes UTC (tiempo real transcurrido, también en el cambio de hora); todo lo mostrado usa los formateadores `es-ES`/`Europe/Madrid` de `tiempo.js`. No hay importes nuevos (el portal no muestra precios). | research D5; contrato |
 | III. Cero solapes | La cancelación solo libera huecos (FR-019 de la 001) y se ejecuta en `BEGIN IMMEDIATE` con `UPDATE … WHERE estado = 'reservada'`; el disparador de la 001 sigue activo. Pruebas con procesos reales: ≥ 20 cancelaciones simultáneas, cancelación contra cambio de recepción, y cancelación contra altas de recepción sobre el hueco liberado. | research D4; data-model; quickstart |
 | IV. Simplicidad y cero alcance fantasma | Cero dependencias nuevas; sin JavaScript en el portal; sin correo; sin cuentas, sesiones ni CSRF propios del paciente (el enlace secreto es la credencial); paginación del historial por parámetro de URL. | research D1–D8 |
@@ -43,9 +43,9 @@ Página personal del paciente, sin cuentas ni contraseñas, donde ve sus próxim
 | VII. Interfaz clara y moderna | Misma hoja de estilos y mismos criterios que la 001 (objetivos ≥ 44 px, contraste AA, estado con texto e icono); diseño de una columna pensado primero para móvil. | research D6; contrato |
 | VIII. Español de España | Textos nuevos en `textos.js`, sin jerga ("enlace", "cita", "cancelar"). | contrato |
 
-**Resultado previo a la investigación**: pasa, salvo el requisito de gobierno de I (propietario y aprobación), que bloquea la implementación pero no el diseño.
+**Resultado previo a la investigación**: pasa. El requisito de gobierno de I (propietario y convivencia con la 001) quedó resuelto el 2026-10-13.
 
-**Re-comprobación tras el diseño**: pasa con la misma salvedad. El diseño no introduce violaciones; la única desviación de la 001 (el portal no reutiliza `cambiarEstado`) está justificada en research D4 y no añade complejidad.
+**Re-comprobación tras el diseño**: pasa. El diseño no introduce violaciones; la única desviación de la 001 (el portal no reutiliza `cambiarEstado`) está justificada en research D4 y no añade complejidad.
 
 ## Project Structure
 
