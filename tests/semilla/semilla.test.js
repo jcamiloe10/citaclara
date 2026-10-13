@@ -160,3 +160,36 @@ describe('Datos de demostración', () => {
     assert.equal(r.futuro.total, ESPERADO.futuro);
   });
 });
+
+describe('Datos de demostración del portal (002)', () => {
+  it('[002:FR-020] las 40 fichas tienen un enlace distinto y reproducible; la clínica tiene teléfono', async () => {
+    const { secretoDeDemostracion } = await import('../../src/seed/datos.js');
+    const { huellaDeSecreto, resolverEnlace } = await import('../../src/domain/enlaces.js');
+    const a = cargar();
+    const b = cargar();
+    const hashes = (db) => db.prepare('SELECT acceso_hash FROM paciente ORDER BY id').all().map((f) => f.acceso_hash);
+    assert.equal(new Set(hashes(a.db)).size, 40);
+    assert.ok(hashes(a.db).every((h) => /^[0-9a-f]{64}$/.test(h)));
+    assert.deepEqual(hashes(a.db), hashes(b.db));
+    assert.equal(hashes(a.db)[7], huellaDeSecreto(secretoDeDemostracion(8)));
+    assert.equal(resolverEnlace(a.db, secretoDeDemostracion(8)).nombre, 'Claudia Rodríguez Pérez');
+    assert.equal(a.db.prepare('SELECT telefono FROM clinica').get().telefono, '910123456');
+  });
+
+  it('[002:FR-020] los recuentos de la 001 no cambian y ninguna cita nace cancelada por el paciente', () => {
+    const { db, resumen } = cargar();
+    assert.equal(resumen.citas, ESPERADO.citas);
+    assert.deepEqual(resumen.historia, ESPERADO.historia);
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM cita WHERE cancelada_por_paciente = 1').get().n, 0);
+  });
+
+  it('[002:FR-020] la ficha 8 es Claudia Rodríguez Pérez con 39 citas: 10 reservadas, 24 completadas, 3 canceladas, 2 no asistidas', () => {
+    const { db } = cargar();
+    assert.equal(db.prepare('SELECT nombre FROM paciente WHERE id = 8').get().nombre, 'Claudia Rodríguez Pérez');
+    const cuenta = Object.fromEntries(
+      db.prepare('SELECT estado, COUNT(*) AS n FROM cita WHERE paciente_id = 8 GROUP BY estado').all().map((f) => [f.estado, f.n]),
+    );
+    assert.deepEqual(cuenta, { reservada: 10, completada: 24, cancelada: 3, no_asistida: 2 });
+    assert.equal(db.prepare('SELECT nombre FROM paciente WHERE id = 13').get().nombre, 'Claudia Ruiz Romero');
+  });
+});

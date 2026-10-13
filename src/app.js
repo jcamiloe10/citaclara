@@ -6,6 +6,8 @@ import { cargarSesion } from './web/sesion.js';
 import { rutasAcceso } from './web/rutas/acceso.js';
 import { rutasAgenda } from './web/rutas/agenda.js';
 import { rutasCitas } from './web/rutas/citas.js';
+import { rutasPacientes } from './web/rutas/pacientes.js';
+import { rutasPortal } from './web/rutas/portal.js';
 import { esc, pagina } from './web/vistas/base.js';
 
 /** Construye la aplicación. Recibe base y reloj para poder fijarlos en las pruebas. */
@@ -16,10 +18,13 @@ export function crearApp({ db, ahora = ahoraReal, secreto }) {
 
   app.use(express.static(fileURLToPath(new URL('./web/publico', import.meta.url))));
   app.use(express.urlencoded({ extended: false }));
+  // Portal del paciente: sin sesión de recepción; antes de cargarla para que nunca la lea.
+  app.use('/p', rutasPortal(contexto));
   app.use(cargarSesion(contexto));
   app.use(rutasAcceso(contexto));
   app.use(rutasAgenda(contexto));
   app.use(rutasCitas(contexto));
+  app.use(rutasPacientes(contexto));
 
   app.use((req, res) => {
     res.status(404).type('html').send(

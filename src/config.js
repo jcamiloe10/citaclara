@@ -5,5 +5,7 @@ export const config = {
   puerto: Number(process.env.PORT) || 3000,
   rutaBase: resolve(process.env.CITACLARA_BASE || 'data/citaclara.db'),
   // Sin secreto en el entorno, las sesiones se pierden al reiniciar (aceptable en desarrollo).
+  // Dirección pública para componer los enlaces de los pacientes; sin ella se usa la de la petición.
+  urlPublica: (process.env.CITACLARA_URL_PUBLICA || '').replace(/\/+$/, '') || null,
   secreto: process.env.CITACLARA_SECRETO || randomBytes(32).toString('hex'),
 };

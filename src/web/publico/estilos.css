@@ -109,3 +109,18 @@ h2 small { display: block; font-size: 0.9rem; font-weight: 400; color: var(--tex
   .cabecera { padding: 8px 12px; }
   .encabezado-agenda .boton, .navegacion-dias .boton { flex: 1 1 auto; }
 }
+
+/* ---- Portal del paciente (002) y pantalla de pacientes ---- */
+.menu { margin-left: auto; }
+.menu a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-weight: 600; color: var(--primario); }
+.portal-contenido { max-width: 40rem; }
+.portal-pie p { margin: 2px 0; }
+.lista-citas { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.cita-portal { margin: 0; border-left: 6px solid var(--borde); }
+.cita-portal.estado-borde-reservada { border-left-color: var(--primario); }
+.cita-portal.estado-borde-cancelada { border-left-color: var(--peligro); }
+.cita-portal p { margin: 4px 0; overflow-wrap: anywhere; }
+.cita-cuando { font-weight: 700; font-size: 1.05rem; }
+.cita-detalle { color: var(--texto); }
+.fila-paciente p { margin: 4px 0; }
+.formulario input[type="search"], .formulario input[readonly] { min-height: 44px; flex: 1 1 12rem; max-width: 100%; }

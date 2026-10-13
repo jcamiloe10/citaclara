@@ -3,10 +3,11 @@
 import { pathToFileURL } from 'node:url';
 import { abrirBase, enTransaccionInmediata } from '../db/connection.js';
 import { crearClinica } from '../domain/clinicas.js';
+import { huellaDeSecreto } from '../domain/enlaces.js';
 import { aInstanteUTC, ahoraReal, hoyMadrid, iso, lunesDeLaSemana, sumarDias } from '../domain/tiempo.js';
 import {
   APELLIDOS, CLINICA, NOMBRES, NUM_PACIENTES, PROFESIONALES, PROPORCION_CANCELADA,
-  PROPORCION_NO_ASISTIDA, SEMANAS_FUTURO, SEMANAS_HISTORIA, SEMILLA, SERVICIOS,
+  PROPORCION_NO_ASISTIDA, SEMANAS_FUTURO, SEMANAS_HISTORIA, SEMILLA, SERVICIOS, secretoDeDemostracion,
 } from './datos.js';
 import { crearPrng } from './prng.js';
 
@@ -147,6 +148,11 @@ export function cargarSemilla(db, { ancla = lunesDeLaSemana(hoyMadrid(ahoraReal(
       insertar.run(clinicaId, c.profesionalId, c.servicioId, c.pacienteId, iso(c.inicio), iso(c.fin), c.estado);
     }
 
+    // Enlace personal de cada ficha: solo la huella, como en producción (002, FR-020).
+    idsPacientes.forEach((id, i) => {
+      db.prepare('UPDATE paciente SET acceso_hash = ? WHERE id = ?').run(huellaDeSecreto(secretoDeDemostracion(i + 1)), id);
+    });
+
     return {
       clinicaId,
       ancla,
@@ -175,5 +181,6 @@ if (esPrincipal) {
     `  Historia: ${r.historia.total} (completadas ${r.historia.completada}, no asistidas ${r.historia.no_asistida}, canceladas ${r.historia.cancelada})`,
   );
   console.log(`  Futuro: ${r.futuro.total} reservadas`);
+  console.log(`  Enlace de demostración de la ficha 8 (Claudia Rodríguez Pérez): http://localhost:${config.puerto}/p/${secretoDeDemostracion(8)}`);
   db.close();
 }
