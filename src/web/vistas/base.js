@@ -9,6 +9,7 @@ export function pagina({ titulo, contenido, sesion, aviso, error }) {
   const cabecera = sesion
     ? `<header class="cabecera">
         <a class="marca" href="/agenda">${esc(textos.marca)}<span class="clinica">${esc(sesion.nombre)}</span></a>
+        <nav class="menu"><a href="/pacientes">${esc(textos.pacientes.enlace)}</a></nav>
         <form method="post" action="/salir">
           <input type="hidden" name="csrf" value="${esc(sesion.csrf)}">
           <button class="boton secundario" type="submit">${esc(textos.cerrarSesion)}</button>

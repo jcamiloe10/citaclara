@@ -56,7 +56,7 @@ npm test                  # toda la suite, 001 y 003
 npm run trazabilidad      # cada FR y escenario de la 001 y de la 003 tiene un test que lo referencia
 ```
 
-Las pruebas de la 003 están en `tests/recordatorios/` (unitarias, integración y concurrencia) con identificadores `[R3-…]` (research D11). Incluyen: 20 ejecuciones simultáneas sin duplicados (SC-002), cancelación por enlace frente a reserva del mismo hueco desde procesos distintos sin solapes (SC-004, Principio III), enlaces manipulados (SC-005) y el cambio de hora de octubre (SC-007).
+Las pruebas de la 003 están en `tests/recordatorios/` (unitarias, integración y concurrencia) con identificadores `[003:…]` (research D11). Incluyen: 20 ejecuciones simultáneas sin duplicados (SC-002), cancelación por enlace frente a reserva del mismo hueco desde procesos distintos sin solapes (SC-004, Principio III), enlaces manipulados (SC-005) y el cambio de hora de octubre (SC-007).
 
 ## 5. Verificación manual de uso (SC-003, SC-006)
 

@@ -45,7 +45,7 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 
 ## D7. Secreto del enlace (formato de la 002)
 
-- **Decisión**: se usa el mismo formato de la 002: 32 bytes aleatorios de `crypto.randomBytes` en base64url (43 caracteres), validados con `FORMATO_SECRETO` y con huella `huellaDeSecreto` (SHA-256 en hexadecimal) de `src/domain/enlaces.js`. Si ese módulo aún no expone un generador de secretos reutilizable, se extrae allí (cambio mínimo, sin duplicar código). En la base solo se guarda la huella (`recordatorio.token_huella`, índice único); el secreto en claro solo existe en el `.eml`. Sin caducidad por tiempo: deja de valer cuando la cita deja de estar reservada o cambia su hora de inicio.
+- **Decisión**: se usa el mismo formato de la 002: 32 bytes aleatorios de `crypto.randomBytes` en base64url (43 caracteres), validados con `FORMATO_SECRETO` y con huella `huellaDeSecreto` (SHA-256 en hexadecimal) de `src/domain/enlaces.js`. Ese módulo (verificado) expone `FORMATO_SECRETO` y `huellaDeSecreto`, pero el secreto se genera dentro de `crearOrenovarEnlace`; se extrae allí un `nuevoSecreto()` reutilizable (cambio mínimo, sin cambiar el comportamiento de la 002). En la base solo se guarda la huella (`recordatorio.token_huella`, índice único); el secreto en claro solo existe en el `.eml`. Sin caducidad por tiempo: deja de valer cuando la cita deja de estar reservada o cambia su hora de inicio.
 - **Por qué**: 256 bits no son adivinables, no contienen datos personales (edge case de la spec) ni permiten deducir otra cita (FR-010), y guardar solo la huella evita que una copia de la base permita cancelar citas. Es la misma elección que la 002, con las mismas pruebas.
 - **Alternativas**: id de cita firmado (permite probar ids y no se invalida al mover la cita); un módulo de enlaces propio (duplicaría el de la 002).
 
@@ -67,11 +67,11 @@ Decisiones técnicas del plan. Cada una resuelve una pregunta que la spec deja a
 - **Cifras para los tests y el quickstart**, calculadas con la semilla y la ancla del lunes 2026-10-12 (reservas del lunes 19 al viernes 30 de octubre): con `ahora` = domingo 2026-10-18 12:00 → **18** recordatorios; con `ahora` = lunes 2026-10-19 12:00 → **19**; con `ahora` = viernes 2026-10-23 12:00 → **0** (la ventana cae en fin de semana); con `ahora` = jueves 2026-10-22 10:00 → **21**.
 - **Por qué**: Principio V: cualquier persona obtiene los mismos números con la misma semilla y el mismo instante.
 
-## D11. Trazabilidad con dos specs
+## D11. Trazabilidad con tres specs (convención de la 002)
 
-- **Decisión**: las pruebas de la 003 van en `tests/recordatorios/` y llevan sus identificadores entre corchetes con prefijo `R3-` (por ejemplo `[R3-FR-004]`, `[R3-US2-E3]`). `scripts/trazabilidad.js` se amplía para comprobar cada spec contra su carpeta de pruebas: la 001 contra `tests/` excluyendo `tests/recordatorios/`, y la 003 contra `tests/recordatorios/` leyendo los identificadores con el prefijo. `npm run trazabilidad` falla si cualquiera de las dos queda sin cobertura.
-- **Por qué**: sin prefijo, `[FR-004]` de la 003 daría por cubierto el `FR-004` de la 001 y al revés (los identificadores se repiten entre specs). Principio VI.
-- **Alternativas**: renumerar los requisitos de la 003 (`FR-301…`: rompe la convención del equipo); un solo conjunto sin prefijo (cobertura falsa).
+- **Decisión**: se sigue la convención que ya fijó la 002 en `scripts/trazabilidad.js`: la 001 etiqueta sin prefijo (`[FR-011]`), la 002 con `002:` y la **003 con `003:`** (por ejemplo `[003:FR-004]`, `[003:US2-E3]`, `[003:SC-002]`). Solo hay que añadir a la lista `SPECS` del script la entrada de la 003 (`specs/003-recordatorios-cita/spec.md`, prefijo `003:`, excluidos `FR-022` y `FR-023`). Las pruebas de la 003 se organizan en `tests/recordatorios/`, pero el script busca por etiqueta en todo `tests/`, así que la carpeta es solo de orden.
+- **Por qué**: los identificadores se repiten entre specs; sin prefijo, `[FR-004]` de la 003 daría por cubierto el `FR-004` de otra spec. Reutilizar la convención y el script de la 002 evita un segundo mecanismo (Principio IV) y mantiene un solo `npm run trazabilidad` para las tres. Principio VI.
+- **Alternativas**: un prefijo propio distinto (`R3-`: dos convenciones para lo mismo); renumerar los requisitos (`FR-301…`: rompe la convención del equipo).
 
 ## D12. Qué ve recepción
 
