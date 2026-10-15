@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Implementada (2026-10-13), pendiente de verificación manual de SC-001 y SC-002 · Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas
+**Status**: Cerrada (2026-10-14) sin medir SC-001 y SC-002 con personas, por decisión del propietario · Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas
 
 **Input**: User description: "Portal del paciente. Los pacientes de la clínica quieren ver sus citas y cancelarlas sin llamar por teléfono (Sonia, recepción de Eleva, dedica «la mitad de la mañana» a esto). Un paciente accede a una página personal moderna donde ve sus citas futuras y pasadas y puede cancelar una cita futura. Interfaz limpia y responsive, pensada para móvil. Sin cuentas ni contraseñas. Fuera de alcance v1: reservar o mover citas online, pagos."
 
