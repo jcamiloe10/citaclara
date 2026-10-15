@@ -4,7 +4,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { crearApp } from '../../src/app.js';
-import { abrirBase } from '../../src/db/connection.js';
+import { abrirBase, abrirBaseSoloLectura } from '../../src/db/connection.js';
 import { crearClinica } from '../../src/domain/clinicas.js';
 import { aInstanteUTC } from '../../src/domain/tiempo.js';
 
@@ -112,7 +112,10 @@ export function haySolapes(db) {
 
 /** Arranca la aplicación en un puerto libre y devuelve un cliente con cookie y token de formulario. */
 export async function iniciarServidor(entorno) {
-  const app = crearApp({ db: entorno.db, ahora: entorno.ahora, secreto: SECRETO });
+  // Sin `ruta` (p. ej. un entorno construido a mano con solo `db` y `ahora`), se abre una
+  // segunda base en memoria independiente: basta para los flujos que no pasan por /analitica.
+  const dbSoloLectura = abrirBaseSoloLectura(entorno.ruta ?? ':memory:');
+  const app = crearApp({ db: entorno.db, dbSoloLectura, ahora: entorno.ahora, secreto: SECRETO });
   const servidor = createServer(app);
   await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
   const base = `http://127.0.0.1:${servidor.address().port}`;
@@ -154,7 +157,13 @@ export async function iniciarServidor(entorno) {
       return cliente.post(ruta, { csrf: await cliente.csrf(), ...datos });
     },
   };
-  cliente.cerrar = () => new Promise((ok) => servidor.close(ok));
+  cliente.cerrar = () =>
+    new Promise((ok) =>
+      servidor.close(() => {
+        dbSoloLectura.close();
+        ok();
+      }),
+    );
   return cliente;
 }
 

@@ -6,13 +6,14 @@ import { cargarSesion } from './web/sesion.js';
 import { rutasAcceso } from './web/rutas/acceso.js';
 import { rutasAgenda } from './web/rutas/agenda.js';
 import { rutasCitas } from './web/rutas/citas.js';
+import { rutasAnalitica } from './web/rutas/analitica.js';
 import { esc, pagina } from './web/vistas/base.js';
 
-/** Construye la aplicación. Recibe base y reloj para poder fijarlos en las pruebas. */
-export function crearApp({ db, ahora = ahoraReal, secreto }) {
+/** Construye la aplicación. Recibe bases y reloj para poder fijarlos en las pruebas. */
+export function crearApp({ db, dbSoloLectura, ahora = ahoraReal, secreto }) {
   const app = express();
   app.disable('x-powered-by');
-  const contexto = { db, ahora, secreto };
+  const contexto = { db, dbSoloLectura, ahora, secreto };
 
   app.use(express.static(fileURLToPath(new URL('./web/publico', import.meta.url))));
   app.use(express.urlencoded({ extended: false }));
@@ -20,6 +21,7 @@ export function crearApp({ db, ahora = ahoraReal, secreto }) {
   app.use(rutasAcceso(contexto));
   app.use(rutasAgenda(contexto));
   app.use(rutasCitas(contexto));
+  app.use(rutasAnalitica(contexto));
 
   app.use((req, res) => {
     res.status(404).type('html').send(
