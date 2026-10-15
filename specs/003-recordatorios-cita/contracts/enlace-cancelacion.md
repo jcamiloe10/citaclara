@@ -20,7 +20,7 @@ Convenciones:
 |---|---|---|
 | Recordatorio válido, cita `reservada`, faltan 24 h o más | 200 | Datos de la cita (clínica, paciente, profesional, servicio, día y hora) y el botón "Cancelar mi cita" (formulario `POST` a la misma ruta), con la explicación "Al cancelar, el hueco queda libre para otra persona". |
 | Cita `reservada`, faltan menos de 24 h (o ya ha empezado) | 200 | Datos de la cita y el aviso "Ya no se puede cancelar desde aquí. Llama a la clínica" con su teléfono si lo hay. Sin botón. |
-| Cita ya `cancelada` | 200 | Datos de la cita y "Esta cita ya está cancelada." Sin botón. |
+| Cita ya `cancelada` (por el paciente o por recepción) | 200 | Datos de la cita y "Esta cita ya está cancelada." Sin botón. |
 | Cita `completada` o `no_asistida` | 200 | "Esta cita ya no se puede cancelar." Sin botón. |
 | Token desconocido, mal formado o recordatorio sustituido por un cambio de hora (FR-017) | 404 | "Este enlace no es válido." Sin datos de ninguna cita ni paciente y sin indicar si la cita existe (FR-015). |
 

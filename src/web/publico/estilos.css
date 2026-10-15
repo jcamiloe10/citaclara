@@ -94,6 +94,8 @@ h2 small { display: block; font-size: 0.9rem; font-weight: 400; color: var(--tex
 .estado-completada { color: #394855; }
 .estado-cancelada { color: var(--peligro); }
 .estado-no_asistida { color: #8a5a00; }
+.estado-sin-email { color: #8a5a00; }
+.aviso-sin-email { margin-top: 4px; }
 
 .acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .accion { margin: 0; }

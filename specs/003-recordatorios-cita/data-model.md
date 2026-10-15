@@ -58,7 +58,7 @@ El enlace permite ver o cancelar solo si **todas** estas condiciones se cumplen 
 3. `cita.estado = 'reservada'`.
 4. Para cancelar: `cita.inicio - ahora >= 24 h` (inclusive, FR-012); lo comprueba la función de la 002.
 
-Resultados posibles: `cancelada` (ok), `ya_cancelada`, `no_reservada` (completada, no asistida o cancelada por recepción), `sin_margen` (faltan menos de 24 h o la cita ya empezó: llamar a la clínica), `no_valido` (secreto desconocido o recordatorio sustituido por un cambio de hora; mensaje genérico, FR-015). Los códigos de la 002 se traducen a estos (research D5).
+Resultados posibles: `cancelada` (ok), `ya_cancelada` (la cita ya estaba cancelada, por el paciente o por recepción), `no_reservada` (completada o no asistida), `sin_margen` (faltan menos de 24 h o la cita ya empezó: llamar a la clínica), `no_valido` (secreto desconocido o recordatorio sustituido por un cambio de hora; mensaje genérico, FR-015). Los códigos de la 002 se traducen a estos (research D5).
 
 ## Consultas que añade esta feature
 

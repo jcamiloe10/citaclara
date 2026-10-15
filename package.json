@@ -9,6 +9,7 @@
     "start": "node --disable-warning=ExperimentalWarning src/server.js",
     "seed": "node --disable-warning=ExperimentalWarning src/seed/seed.js",
     "test": "node --disable-warning=ExperimentalWarning --test \"tests/**/*.test.js\"",
+    "recordatorios": "node --disable-warning=ExperimentalWarning src/recordatorios/ejecutar.js",
     "trazabilidad": "node scripts/trazabilidad.js"
   },
   "dependencies": {

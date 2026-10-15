@@ -23,10 +23,18 @@ function acciones(cita, dia, sesion, ahora) {
   return `<div class="acciones">${boton('completada', !haEmpezado)}${boton('no_asistida', !haEmpezado)}${boton('cancelada', false)}</div>${nota}`;
 }
 
+/** Aviso a recepción: la cita reservada no pudo recordarse porque el paciente no tiene email válido (003, FR-006). */
+function avisoSinEmail(cita) {
+  if (cita.estado !== 'reservada' || cita.recordatorio !== 'sin_email') return '';
+  const e = textos.agenda.sinEmail;
+  return `<p class="detalle aviso-sin-email"><span class="estado estado-sin-email"><span aria-hidden="true">${e.icono}</span> ${esc(e.texto)}</span></p>`;
+}
+
 function tramoOcupado(cita, dia, sesion, ahora) {
   return `<li class="tramo ocupado estado-borde-${esc(cita.estado)}">
     <p class="horario">${esc(formatoRango(cita.inicio, cita.fin))} ${insigniaEstado(cita.estado)}</p>
     <p class="detalle"><strong>${esc(cita.paciente)}</strong></p>
+    ${avisoSinEmail(cita)}
     <p class="detalle">${esc(cita.servicio)} · ${esc(cita.duracionMin)} min · ${esc(cita.precio)}</p>
     ${acciones(cita, dia, sesion, ahora)}
   </li>`;

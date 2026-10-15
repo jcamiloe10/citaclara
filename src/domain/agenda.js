@@ -12,11 +12,13 @@ import {
 const SELECT_CITA = `
   SELECT c.id, c.profesional_id AS profesionalId, c.inicio, c.fin, c.estado,
          c.cancelada_por_paciente AS canceladaPorPaciente,
+         r.resultado AS recordatorio,
          s.nombre AS servicio, s.duracion_min AS duracionMin, s.precio_centimos AS precioCentimos,
          p.id AS pacienteId, p.nombre AS paciente
   FROM cita c
   JOIN servicio s ON s.id = c.servicio_id
-  JOIN paciente p ON p.id = c.paciente_id`;
+  JOIN paciente p ON p.id = c.paciente_id
+  LEFT JOIN recordatorio r ON r.cita_id = c.id AND r.inicio_cita = c.inicio`;
 
 const aCita = (f) => ({
   ...f,

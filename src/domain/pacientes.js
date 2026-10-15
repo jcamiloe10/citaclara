@@ -1,5 +1,8 @@
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+/** Formato de correo que acepta la ficha del paciente (001, FR-008b). */
+export const emailValido = (correo) => RE_EMAIL.test(String(correo ?? '').trim());
+
 /** Teléfono español: 9 dígitos que empiezan por 6, 7, 8 o 9; admite prefijo +34 / 0034 y separadores. */
 export function normalizarTelefono(texto) {
   let t = String(texto ?? '').replace(/[\s.\-()]/g, '');

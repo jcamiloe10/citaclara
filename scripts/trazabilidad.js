@@ -2,7 +2,7 @@
 // aparece entre corchetes en el nombre de algún test (Principio VI, SC-008 de la 001, SC-009 de la 002).
 //
 // Los identificadores de la 001 se etiquetan sin prefijo ([FR-011], [US1-E2]); los de la 002 llevan
-// el prefijo "002:" ([002:FR-011], [002:US1-E2]), porque ambas specs usan la misma numeración.
+// el prefijo "002:" ([002:FR-011], [002:US1-E2]) y los de la 003 el prefijo "003:", porque ambas specs usan la misma numeración.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -14,6 +14,8 @@ const EXCLUIDOS_001 = new Set(['FR-008']);
 export const SPECS = [
   { ruta: 'specs/001-agenda-core/spec.md', prefijo: '', excluidos: EXCLUIDOS_001 },
   { ruta: 'specs/002-portal-del-paciente/spec.md', prefijo: '002:', excluidos: new Set() },
+  // FR-022 (límite de alcance) y FR-023 (gobierno) de la 003 no tienen comportamiento que probar.
+  { ruta: 'specs/003-recordatorios-cita/spec.md', prefijo: '003:', excluidos: new Set(['FR-022', 'FR-023']) },
 ];
 
 /** Extrae de la spec los identificadores exigibles y los alias RN↔FR. */

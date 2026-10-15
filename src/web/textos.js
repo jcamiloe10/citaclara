@@ -22,6 +22,7 @@ export const textos = {
     libre: 'Libre',
     reservar: 'Reservar',
     cerrado: 'La clínica no abre este día',
+    sinEmail: { texto: 'Sin email: sin recordatorio', icono: '✉' },
     sinCitas: 'Sin citas',
     historico: 'Canceladas y no asistidas',
     diaInvalido: 'El día indicado no es válido',
@@ -61,6 +62,26 @@ export const textos = {
       fueraDePlazo: 'Esa cita ya no se puede cancelar desde aquí. Llama a la clínica.',
       noDisponible: 'No hemos encontrado esa cita.',
     },
+  },
+
+  // Enlace de cancelación del recordatorio (003)
+  enlace: {
+    titulo: 'Tu cita',
+    cuando: 'Día y hora',
+    cuandoDeEspana: (texto) => `${texto} (hora de España)`,
+    clinica: 'Clínica',
+    profesional: 'Profesional',
+    servicio: 'Servicio',
+    explicacion: 'Si no vas a poder venir, cancela la cita: al cancelar, el hueco queda libre para otra persona.',
+    botonCancelar: 'Cancelar mi cita',
+    noCancelar: 'No, mantener mi cita',
+    cancelada: 'Tu cita queda cancelada. Gracias por avisar.',
+    yaCancelada: 'Esta cita ya está cancelada.',
+    noReservada: 'Esta cita ya no se puede cancelar.',
+    sinMargen: 'Ya no se puede cancelar desde aquí, porque falta menos de 24 horas.',
+    llamaA: (nombre) => `Llama a ${nombre}`,
+    noValido: 'Este enlace no es válido.',
+    noValidoAyuda: 'Si tienes dudas sobre tu cita, llama a la clínica.',
   },
 
   // Pantalla de pacientes de recepción (002)

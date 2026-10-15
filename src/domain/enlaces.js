@@ -7,9 +7,12 @@ export const FORMATO_SECRETO = /^[A-Za-z0-9_-]{43}$/;
 
 export const huellaDeSecreto = (secreto) => createHash('sha256').update(String(secreto)).digest('hex');
 
+/** Secreto nuevo de 256 bits (43 caracteres base64url). Lo usan el enlace personal (002) y el de cancelación (003). */
+export const nuevoSecreto = () => randomBytes(32).toString('base64url');
+
 /** Crea el enlace de un paciente o lo renueva; el anterior deja de valer al instante (FR-004). */
 export function crearOrenovarEnlace(db, { clinicaId, pacienteId }) {
-  const secreto = randomBytes(32).toString('base64url');
+  const secreto = nuevoSecreto();
   const { changes } = db
     .prepare('UPDATE paciente SET acceso_hash = ? WHERE id = ? AND clinica_id = ?')
     .run(huellaDeSecreto(secreto), pacienteId, clinicaId);

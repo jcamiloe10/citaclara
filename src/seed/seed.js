@@ -77,7 +77,7 @@ function diasLaborables(desde, semanas) {
 export function cargarSemilla(db, { ancla = lunesDeLaSemana(hoyMadrid(ahoraReal())), semilla = SEMILLA } = {}) {
   return enTransaccionInmediata(db, () => {
     for (const { id } of db.prepare('SELECT id FROM clinica WHERE nombre = ?').all(CLINICA.nombre)) {
-      for (const tabla of ['cita', 'paciente', 'servicio', 'profesional']) {
+      for (const tabla of ['recordatorio', 'cita', 'paciente', 'servicio', 'profesional']) {
         db.prepare(`DELETE FROM ${tabla} WHERE clinica_id = ?`).run(id);
       }
       db.prepare('DELETE FROM clinica WHERE id = ?').run(id);

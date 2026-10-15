@@ -169,3 +169,14 @@ export function textoVisible(html) {
     .replace(/&#39;/g, "'")
     .replace(/\s+/g, ' ');
 }
+
+/** Carpeta temporal para la salida de correo simulada (003). `limpiar()` la borra. */
+export function crearCarpetaSalida() {
+  const ruta = mkdtempSync(join(tmpdir(), 'citaclara-correo-'));
+  return { ruta, limpiar: () => rmSync(ruta, { recursive: true, force: true }) };
+}
+
+/** Fija el teléfono de contacto de una clínica (002, `clinica.telefono`). */
+export function conTelefonoClinica(db, clinicaId, telefono) {
+  db.prepare('UPDATE clinica SET telefono = ? WHERE id = ?').run(telefono, clinicaId);
+}

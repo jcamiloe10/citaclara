@@ -6,6 +6,7 @@ import { cargarSesion } from './web/sesion.js';
 import { rutasAcceso } from './web/rutas/acceso.js';
 import { rutasAgenda } from './web/rutas/agenda.js';
 import { rutasCitas } from './web/rutas/citas.js';
+import { rutasEnlace } from './web/rutas/enlace.js';
 import { rutasPacientes } from './web/rutas/pacientes.js';
 import { rutasPortal } from './web/rutas/portal.js';
 import { esc, pagina } from './web/vistas/base.js';
@@ -20,6 +21,8 @@ export function crearApp({ db, ahora = ahoraReal, secreto }) {
   app.use(express.urlencoded({ extended: false }));
   // Portal del paciente: sin sesión de recepción; antes de cargarla para que nunca la lea.
   app.use('/p', rutasPortal(contexto));
+  // Enlace de cancelación de los recordatorios (003): también público, sin sesión de recepción.
+  app.use('/cancelar', rutasEnlace(contexto));
   app.use(cargarSesion(contexto));
   app.use(rutasAcceso(contexto));
   app.use(rutasAgenda(contexto));

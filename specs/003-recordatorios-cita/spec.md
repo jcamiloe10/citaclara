@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-13
 
-**Status**: Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas · Se implementa sobre la 002 (ver Assumptions)
+**Status**: Implementada (2026-10-14), pendiente de verificación manual (SC-003, SC-006) · Aprobada (2026-10-13) · Propietario: Camilo (ver `specs/MAPA.md`) · Decisiones de Sara incorporadas · Se implementa sobre la 002 (ver Assumptions)
 
 **Input**: User description: "Recordatorios de cita. El dolor número uno del cliente piloto: la no asistencia. Alcance: un proceso diario genera un recordatorio por email para cada cita reservada de las próximas 24-48 horas, sin duplicar envíos; el email incluye los datos de la cita y una forma de que el paciente cancele si no va a ir (mejor un hueco libre que un no-show). Correo en modo simulado sin SMTP configurado: se escriben ficheros .eml en datos/salida-correo/. Preguntas cerradas para Sara: antelación exacta, qué pasa si el paciente cancela desde el email y con cuánta antelación puede, y si el recordatorio se reenvía cuando la cita se mueve. Fuera de alcance v1: SMS y WhatsApp."
 
