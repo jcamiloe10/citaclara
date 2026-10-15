@@ -58,6 +58,8 @@ Cobertura que debe pasar, entre otras:
 
 ## 4. Verificación manual de uso
 
+> **Estado (2026-10-14)**: SC-001 y SC-002 **no se han medido con personas**. Camilo, propietario de la spec, la cerró sin esa prueba. Si se mide más adelante, se anotan aquí los tiempos.
+
 - **Medir SC-003 (origen de las cancelaciones)**: `SELECT SUM(cancelada_por_paciente) AS desde_portal, COUNT(*) AS total FROM cita WHERE estado = 'cancelada' AND inicio >= ?` sobre la base de la clínica; las cancelaciones hechas por teléfono las registra recepción y cuentan con `cancelada_por_paciente = 0`.
 
 - **SC-001**: una persona que no conoce el portal encuentra y cancela una cita en menos de 1 minuto, desde el móvil.

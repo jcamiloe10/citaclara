@@ -5,7 +5,7 @@ Fuente única de verdad sobre la propiedad de cada spec (Constitución, Principi
 | Spec | Propietario | Estado | Zona de comportamiento que toca |
 |------|-------------|--------|---------------------------------|
 | [001-agenda-core](001-agenda-core/spec.md) | Camilo | Cerrada (2026-10-03) | Agenda de cada profesional (escribe citas); acceso de recepción; datos de demostración |
-| [002-portal-del-paciente](002-portal-del-paciente/spec.md) | Camilo | Implementada (2026-10-13); pendiente de verificación manual SC-001/SC-002 | Estado de las citas (solo cancela: reservada → cancelada); acceso personal del paciente; ficha del paciente; datos de demostración (teléfono de la clínica) |
+| [002-portal-del-paciente](002-portal-del-paciente/spec.md) | Camilo | Cerrada (2026-10-14); SC-001 y SC-002 sin medir con personas, por decisión del propietario | Estado de las citas (solo cancela: reservada → cancelada); acceso personal del paciente; ficha del paciente; datos de demostración (teléfono de la clínica) |
 | [003-recordatorios-cita](003-recordatorios-cita/spec.md) | Camilo | Implementada (2026-10-14); pendiente de verificación manual SC-003/SC-006 y de abrir un .eml en un cliente de correo real | Estado de las citas (solo cancela: reservada → cancelada, vía la regla de la 002); correo de salida; tabla de recordatorios |
 
 ## Relaciones entre specs
