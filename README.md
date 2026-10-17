@@ -1,8 +1,8 @@
 # CitaClara
 
-Núcleo de agenda para clínicas pequeñas (2-5 profesionales). La recepción gestiona la agenda: ve el día de cada profesional, reserva citas sin solapes y las cierra como completadas, canceladas o no asistidas.
+Núcleo de agenda para clínicas pequeñas (2-5 profesionales). La recepción gestiona la agenda: ve el día de cada profesional, reserva citas sin solapes y las cierra como completadas, canceladas o no asistidas. Un panel de analítica de solo lectura muestra, para la reunión de renovación, la ocupación y la no asistencia por profesional, los ingresos por servicio y su evolución en las últimas 8 semanas.
 
-Es un proyecto Spec-Driven: la fuente de verdad son las specs de [specs/](specs/) (propietarios en [specs/MAPA.md](specs/MAPA.md)) y los principios de [.specify/memory/constitution.md](.specify/memory/constitution.md). Las specs vigentes son [001-agenda-core](specs/001-agenda-core/spec.md) y [002-portal-del-paciente](specs/002-portal-del-paciente/spec.md).
+Es un proyecto Spec-Driven: la fuente de verdad son las specs de [specs/](specs/) (propietarios en [specs/MAPA.md](specs/MAPA.md)) y los principios de [.specify/memory/constitution.md](.specify/memory/constitution.md). Las specs vigentes son [001-agenda-core](specs/001-agenda-core/spec.md) , [002-portal-del-paciente](specs/002-portal-del-paciente/spec.md), [003-recordatorios-cita](specs/003-recordatorios-cita/spec.md) y [004-citaclara-analitica](specs/004-citaclara-analitica/spec.md).
 
 ## Requisitos
 
@@ -55,6 +55,10 @@ schtasks /Create /SC DAILY /ST 08:00 /TN "CitaClara recordatorios 2" /TR "cmd /c
 
 Recepción ve en la agenda del día qué citas canceló el paciente ("Cancelada por el paciente") y cuáles no pudieron recordarse por falta de email ("Sin email: sin recordatorio"). Más en [specs/003-recordatorios-cita/quickstart.md](specs/003-recordatorios-cita/quickstart.md).
 
+## Panel de analítica (solo lectura)
+
+`/analitica` (enlace "Analítica" en la cabecera, con la misma clave de clínica que la agenda) muestra la ocupación semanal y la tasa de no asistencia por profesional, los ingresos por servicio y su evolución en las últimas 8 semanas. Es estrictamente de solo lectura: no existe ningún formulario ni acción que escriba en la agenda, la clínica, los profesionales, los servicios o los pacientes. Esa garantía tiene dos defensas (igual filosofía que el cero solapes de la 001): el dominio de esta feature solo emite `SELECT`, y además lee a través de una segunda conexión SQLite con un autorizador que rechaza cualquier escritura, aunque el código se equivocara. Detalle en [specs/004-citaclara-analitica](specs/004-citaclara-analitica/spec.md).
+
 ## Aviso: autenticación simplificada (deuda consciente)
 
 La versión 1 protege el panel con una única clave por clínica. No hay cuentas de usuario, recuperación de clave ni bloqueo por intentos fallidos. Es suficiente para demostración y uso piloto, y está declarada como deuda a sustituir en una spec propia.
@@ -66,12 +70,12 @@ Un profesional nunca tiene dos citas reservadas o completadas a la vez, tampoco 
 ## Estructura
 
 ```text
-src/domain/    reglas de negocio (tiempo, dinero, citas, agenda, pacientes, clínicas, portal, recordatorios)
+src/domain/    reglas de negocio (tiempo, dinero, citas, agenda, pacientes, clínicas, portal, recordatorios, analítica)
 src/correo/    mensaje .eml del recordatorio y salida de correo simulada
 src/recordatorios/  comando del proceso diario
-src/db/        conexión SQLite y esquema (con el disparador anti-solape)
+src/db/        conexión SQLite y esquema (con el disparador anti-solape y la conexión de solo lectura)
 src/web/       rutas, vistas, textos en español y hoja de estilos
 src/seed/      generador determinista de datos de demostración
-tests/         unitarias, integración HTTP, concurrencia y semilla
-scripts/       comprobación de trazabilidad spec ↔ tests
+tests/         unitarias, integración HTTP, concurrencia, semilla y solo-lectura
+scripts/       comprobación de trazabilidad spec ↔ tests (todas las specs)
 ```

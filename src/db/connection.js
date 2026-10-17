@@ -1,5 +1,5 @@
 // Única apertura de node:sqlite. Si se sustituye el motor, solo cambia este fichero.
-import { DatabaseSync } from 'node:sqlite';
+import { DatabaseSync, constants } from 'node:sqlite';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 
@@ -39,6 +39,29 @@ function migrar(db) {
   db.exec(
     'CREATE UNIQUE INDEX IF NOT EXISTS paciente_acceso_hash ON paciente (acceso_hash) WHERE acceso_hash IS NOT NULL',
   );
+}
+
+// Acciones de solo lectura que el autorizador permite; cualquier otra (INSERT, UPDATE,
+// DELETE, CREATE/DROP/ALTER, PRAGMA, ATTACH...) queda denegada (FR-003 de 004-citaclara-analitica).
+const ACCIONES_DE_LECTURA = new Set([
+  constants.SQLITE_SELECT,
+  constants.SQLITE_READ,
+  constants.SQLITE_FUNCTION,
+  constants.SQLITE_RECURSIVE,
+]);
+
+/**
+ * Segunda conexión sobre el mismo fichero, solo para lectura: un autorizador de SQLite
+ * rechaza cualquier acción que no sea de lectura. Es la red de seguridad de la 004 (solo
+ * lectura), igual filosofía que el disparador anti-solape de la 001. No aplica el esquema
+ * (ya lo aplicó `abrirBase` sobre el mismo fichero) ni acepta `:memory:` como base compartida
+ * con una conexión de escritura, porque cada `:memory:` es una base independiente.
+ */
+export function abrirBaseSoloLectura(ruta) {
+  const db = new DatabaseSync(ruta);
+  db.exec('PRAGMA busy_timeout = 10000');
+  db.setAuthorizer((accion) => (ACCIONES_DE_LECTURA.has(accion) ? constants.SQLITE_OK : constants.SQLITE_DENY));
+  return db;
 }
 
 // Transacción de escritura inmediata: otra escritura no puede intercalarse entre

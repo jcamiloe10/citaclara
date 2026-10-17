@@ -30,6 +30,9 @@ body { margin: 0; background: var(--fondo); min-height: 100vh; display: flex; fl
 }
 .marca { font-weight: 700; font-size: 1.15rem; color: var(--primario); text-decoration: none; display: flex; flex-direction: column; line-height: 1.2; }
 .marca .clinica { font-weight: 400; font-size: 0.85rem; color: var(--texto-suave); }
+.nav-cabecera { display: flex; gap: 8px; margin-right: auto; margin-left: 16px; }
+.nav-cabecera a { color: var(--primario); font-weight: 600; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; padding: 0 6px; }
+.nav-cabecera a:hover { text-decoration: underline; }
 
 .contenido { width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px; flex: 1; }
 .pie { padding: 12px 16px; text-align: center; font-size: 0.85rem; color: var(--texto-suave); }
@@ -104,7 +107,28 @@ h2 small { display: block; font-size: 0.9rem; font-weight: 400; color: var(--tex
 .historico ul { margin: 6px 0 0; padding-left: 18px; color: var(--texto-suave); }
 .historico li { margin-bottom: 4px; }
 
+.periodo-analizado { color: var(--texto-suave); margin: 0 0 20px; }
+
+.bloque-analitica { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 16px; box-shadow: var(--sombra); margin-bottom: 16px; max-width: 640px; }
+.grafico { width: 100%; height: auto; display: block; }
+.grafico-etiqueta { font-size: 13px; fill: var(--texto); }
+.grafico-valor { font-size: 13px; font-weight: 700; fill: var(--texto); }
+.grafico-sin-datos { font-size: 13px; fill: var(--texto-suave); font-style: italic; }
+.grafico-barra { fill: var(--primario); }
+.grafico-total { margin: 12px 0 0; font-weight: 700; }
+.grafico-linea { width: 100%; max-width: 360px; height: 80px; display: block; margin-bottom: 8px; }
+.grafico-polilinea { stroke: var(--primario); stroke-width: 2; }
+.grafico-punto { fill: var(--primario-oscuro); }
+h3 { font-size: 1rem; margin: 14px 0 6px; }
+
+.evolucion-tabla { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.92rem; }
+.evolucion-tabla caption { text-align: left; color: var(--texto-suave); margin-bottom: 6px; }
+.evolucion-tabla th, .evolucion-tabla td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--borde); }
+.evolucion-tabla th:first-child, .evolucion-tabla td:first-child { text-align: left; }
+
 @media (max-width: 600px) {
+  .nav-cabecera { margin-left: 8px; }
+  .bloque-analitica { max-width: none; }
   .contenido { padding: 12px; }
   .fila { grid-template-columns: 1fr; }
   .columnas { grid-template-columns: 1fr; }

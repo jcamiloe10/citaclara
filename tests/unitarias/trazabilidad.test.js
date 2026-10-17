@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { analizar } from '../../scripts/trazabilidad.js';
+import { analizar, SPECS } from '../../scripts/trazabilidad.js';
 
 const SPEC = `
 ### User Story 1 - Reservar (Priority: P1)
@@ -65,5 +65,14 @@ describe('Trazabilidad de la 002 con prefijo', () => {
     assert.deepEqual(analizar(SPEC, '[002:FR-001] [002:FR-002b] [002:RN1] [002:US1-E1] [002:US1-E2]').sinCobertura, [
       'FR-001', 'FR-002b', 'FR-016', 'RN1', 'US1-E1', 'US1-E2',
     ]);
+  });
+});
+
+describe('Trazabilidad de la 004', () => {
+  it('[004:SC-008] la 004 está en la lista de specs comprobadas, con su prefijo y sin excluir ningún requisito', () => {
+    const entrada = SPECS.find((s) => s.ruta === 'specs/004-citaclara-analitica/spec.md');
+    assert.ok(entrada);
+    assert.equal(entrada.prefijo, '004:');
+    assert.equal(entrada.excluidos.size, 0);
   });
 });

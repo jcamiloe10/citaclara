@@ -4,6 +4,21 @@ export const textos = {
   volverAgenda: 'Volver a la agenda',
   cerrarSesion: 'Cerrar sesión',
   zonaHoraria: 'Todas las horas son hora de España.',
+  enlaceAnalitica: 'Analítica',
+
+  analitica: {
+    titulo: 'Analítica de la clínica',
+    volver: 'Volver a la agenda',
+    sinDatos: 'Sin datos en este periodo',
+    ocupacion: 'Ocupación semanal por profesional',
+    noAsistencia: 'Tasa de no asistencia por profesional',
+    ingresos: 'Ingresos por servicio',
+    evolucion: 'Evolución de las últimas 8 semanas',
+    evolucionTablaTitulo: 'Cifras exactas de cada semana',
+    semana: 'Semana',
+    total: 'Total',
+    periodo: (desde, hasta) => `Periodo analizado: del ${desde} al ${hasta}`,
+  },
 
   acceso: {
     titulo: 'Acceso de recepción',
